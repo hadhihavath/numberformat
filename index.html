@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Phone Number Formatter</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0d0d;
+      --surface: #161616;
+      --border: #2a2a2a;
+      --accent: #00ff88;
+      --accent2: #ff6b35;
+      --text: #f0f0f0;
+      --muted: #666;
+      --success: #00e676;
+      --error: #ff1744;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Space Mono', monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px 60px;
+    }
+
+    header {
+      width: 100%;
+      max-width: 860px;
+      margin-bottom: 40px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 24px;
+    }
+
+    .badge {
+      display: inline-block;
+      background: var(--accent);
+      color: #000;
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      padding: 3px 10px;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(28px, 5vw, 48px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -1px;
+    }
+
+    h1 span { color: var(--accent); }
+
+    .subtitle {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 1px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 860px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 640px) {
+      .container { grid-template-columns: 1fr; }
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 20px;
+    }
+
+    .panel-label {
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    textarea {
+      width: 100%;
+      background: #0d0d0d;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      line-height: 1.7;
+      padding: 14px;
+      resize: vertical;
+      min-height: 260px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    textarea:focus { border-color: var(--accent); }
+    textarea::placeholder { color: var(--muted); }
+
+    .controls {
+      grid-column: 1 / -1;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .separator-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .sep-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      padding: 6px 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .sep-btn:hover, .sep-btn.active {
+      background: var(--accent);
+      color: #000;
+      border-color: var(--accent);
+    }
+
+    .sep-custom {
+      background: #0d0d0d;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      padding: 6px 10px;
+      width: 60px;
+      outline: none;
+    }
+
+    .sep-custom:focus { border-color: var(--accent); }
+
+    .btn {
+      padding: 12px 28px;
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+    }
+
+    .btn-primary:hover { background: #00cc6a; }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover { border-color: var(--accent2); color: var(--accent2); }
+
+    .output-box {
+      width: 100%;
+      background: #0d0d0d;
+      border: 1px solid var(--border);
+      min-height: 260px;
+      padding: 14px;
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      line-height: 1.7;
+      color: var(--accent);
+      word-break: break-all;
+      white-space: pre-wrap;
+      cursor: text;
+      user-select: all;
+    }
+
+    .output-placeholder { color: var(--muted); }
+
+    .stats-bar {
+      grid-column: 1 / -1;
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      padding: 14px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .stat { display: flex; gap: 8px; align-items: center; }
+    .stat-val { color: var(--accent); font-weight: 700; }
+    .stat-err { color: var(--error); }
+
+    .copy-btn {
+      margin-left: auto;
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 1px;
+      padding: 4px 14px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .copy-btn:hover { background: var(--accent); color: #000; }
+    .copy-btn.copied { background: var(--success); border-color: var(--success); color: #000; }
+
+    .errors-panel {
+      grid-column: 1 / -1;
+      padding: 14px 16px;
+      background: #1a0a0a;
+      border: 1px solid #3a1010;
+      font-size: 11px;
+      color: #ff6b6b;
+      display: none;
+    }
+
+    .errors-panel.visible { display: block; }
+    .errors-panel ul { list-style: none; margin-top: 6px; }
+    .errors-panel li { padding: 2px 0; }
+    .errors-panel li::before { content: '⚠ '; }
+
+    footer {
+      margin-top: 48px;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="badge">UTILITY TOOL</div>
+  <h1>Phone Number <span>Formatter</span></h1>
+  <p class="subtitle">// paste messy numbers → get clean E.164 format</p>
+</header>
+
+<div class="container">
+
+  <div class="panel">
+    <div class="panel-label">INPUT — raw numbers</div>
+    <textarea id="input" placeholder="+91 95267 27017&#10;+91 85908 53221&#10;+971 54 377 3039&#10;...one per line"></textarea>
+  </div>
+
+  <div class="panel">
+    <div class="panel-label">OUTPUT — formatted</div>
+    <div class="output-box" id="output"><span class="output-placeholder">// formatted numbers appear here</span></div>
+  </div>
+
+  <div class="controls">
+    <div class="separator-group">
+      <span>SEP:</span>
+      <button class="sep-btn active" data-sep=",">comma</button>
+      <button class="sep-btn" data-sep="\n">newline</button>
+      <button class="sep-btn" data-sep=" ">space</button>
+      <button class="sep-btn" data-sep="|">pipe</button>
+      <input class="sep-custom" id="customSep" placeholder="; " title="Custom separator" />
+    </div>
+    <button class="btn btn-primary" onclick="format()">FORMAT →</button>
+    <button class="btn btn-secondary" onclick="clearAll()">CLEAR</button>
+  </div>
+
+  <div class="stats-bar" id="statsBar">
+    <div class="stat">TOTAL <span class="stat-val" id="statTotal">0</span></div>
+    <div class="stat">VALID <span class="stat-val" id="statValid">0</span></div>
+    <div class="stat stat-err">SKIPPED <span class="stat-val stat-err" id="statSkipped">0</span></div>
+    <button class="copy-btn" id="copyBtn" onclick="copyOutput()">COPY ALL</button>
+  </div>
+
+  <div class="errors-panel" id="errorsPanel">
+    <strong>SKIPPED / UNRECOGNIZED:</strong>
+    <ul id="errorsList"></ul>
+  </div>
+
+</div>
+
+<footer>github-deployable · no data leaves your browser</footer>
+
+<script>
+  // ─── Separator picker ───────────────────────────────────────────
+  let activeSep = ',';
+  document.querySelectorAll('.sep-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.sep-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeSep = btn.dataset.sep === '\\n' ? '\n' : btn.dataset.sep;
+      document.getElementById('customSep').value = '';
+      if (document.getElementById('output').innerText.trim() !== '// formatted numbers appear here') format();
+    });
+  });
+
+  document.getElementById('customSep').addEventListener('input', e => {
+    if (e.target.value !== '') {
+      document.querySelectorAll('.sep-btn').forEach(b => b.classList.remove('active'));
+      activeSep = e.target.value;
+      format();
+    }
+  });
+
+  // ─── Core formatter ─────────────────────────────────────────────
+  function stripToDigits(str) {
+    return str.replace(/\D/g, '');
+  }
+
+  function parsePhone(raw) {
+    const trimmed = raw.trim();
+    if (!trimmed) return null;
+
+    // Strip all non-digit/non-plus chars for analysis
+    const digits = stripToDigits(trimmed);
+
+    // Must have at least 7 digits
+    if (digits.length < 7) return { error: true, raw: trimmed };
+
+    // If starts with +, trust the country code
+    if (trimmed.startsWith('+')) {
+      // Extract country code portion: everything up to the first space or after +
+      const withoutPlus = trimmed.slice(1);
+      const allDigits = stripToDigits(withoutPlus);
+
+      // Validate length: international numbers are 7–15 digits
+      if (allDigits.length < 7 || allDigits.length > 15) return { error: true, raw: trimmed };
+
+      return { formatted: '+' + allDigits };
+    }
+
+    // If starts with 00, convert to +
+    if (digits.startsWith('00') && digits.length >= 9) {
+      const withoutIDD = digits.slice(2);
+      return { formatted: '+' + withoutIDD };
+    }
+
+    // Indian local number heuristic: 10 digits starting with 6-9
+    if (digits.length === 10 && /^[6-9]/.test(digits)) {
+      return { formatted: '+91' + digits };
+    }
+
+    // 12-digit starting with 91 (91 + 10 digit)
+    if (digits.length === 12 && digits.startsWith('91')) {
+      return { formatted: '+' + digits };
+    }
+
+    // 11-digit starting with 0 (STD style)
+    if (digits.length === 11 && digits.startsWith('0')) {
+      return { formatted: '+91' + digits.slice(1) };
+    }
+
+    return { error: true, raw: trimmed };
+  }
+
+  function format() {
+    const raw = document.getElementById('input').value;
+    const lines = raw.split('\n').filter(l => l.trim() !== '');
+
+    const results = [];
+    const errors = [];
+
+    lines.forEach(line => {
+      const result = parsePhone(line);
+      if (!result) return;
+      if (result.error) {
+        errors.push(result.raw);
+      } else {
+        results.push(result.formatted);
+      }
+    });
+
+    // Update output
+    const outputEl = document.getElementById('output');
+    if (results.length === 0) {
+      outputEl.innerHTML = '<span class="output-placeholder">// no valid numbers found</span>';
+    } else {
+      outputEl.textContent = results.join(activeSep);
+    }
+
+    // Stats
+    document.getElementById('statTotal').textContent = lines.length;
+    document.getElementById('statValid').textContent = results.length;
+    document.getElementById('statSkipped').textContent = errors.length;
+
+    // Errors list
+    const errPanel = document.getElementById('errorsPanel');
+    const errList = document.getElementById('errorsList');
+    errList.innerHTML = '';
+    if (errors.length > 0) {
+      errors.forEach(e => {
+        const li = document.createElement('li');
+        li.textContent = e;
+        errList.appendChild(li);
+      });
+      errPanel.classList.add('visible');
+    } else {
+      errPanel.classList.remove('visible');
+    }
+
+    // Reset copy btn
+    const copyBtn = document.getElementById('copyBtn');
+    copyBtn.textContent = 'COPY ALL';
+    copyBtn.classList.remove('copied');
+  }
+
+  function copyOutput() {
+    const text = document.getElementById('output').textContent;
+    if (!text || text.includes('//')) return;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = '✓ COPIED';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'COPY ALL';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+
+  function clearAll() {
+    document.getElementById('input').value = '';
+    document.getElementById('output').innerHTML = '<span class="output-placeholder">// formatted numbers appear here</span>';
+    document.getElementById('statTotal').textContent = '0';
+    document.getElementById('statValid').textContent = '0';
+    document.getElementById('statSkipped').textContent = '0';
+    document.getElementById('errorsPanel').classList.remove('visible');
+  }
+
+  // Auto-format on input change (debounced)
+  let debounceTimer;
+  document.getElementById('input').addEventListener('input', () => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(format, 400);
+  });
+</script>
+</body>
+</html>
