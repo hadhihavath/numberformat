@@ -75,6 +75,27 @@
     .chip { display: inline-block; background: var(--surface2); border: 1px solid var(--border); font-size: 10px; padding: 3px 10px; margin: 3px; cursor: pointer; }
     .chip:hover { border-color: var(--accent); color: var(--accent); }
     footer { margin-top: 48px; font-size: 10px; color: var(--muted); letter-spacing: 1px; }
+
+    /* ── SHEET GENERATOR STYLES ── */
+    .sg-step { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 16px; }
+    .sg-step-num { min-width: 26px; height: 26px; background: var(--accent); color: #000; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+    .sg-step-body { flex: 1; }
+    .sg-chips { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .sg-chip { padding: 7px 18px; font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; cursor: pointer; border: 1px solid var(--border); background: var(--surface); color: var(--muted); transition: all 0.15s; user-select: none; }
+    .sg-chip:hover { border-color: var(--accent); color: var(--accent); }
+    .sg-chip.active { background: var(--accent); color: #000; border-color: var(--accent); }
+    .sg-custom { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--muted); }
+    .sg-hint { font-size: 11px; color: var(--muted); margin-top: 8px; }
+    .sg-hint span { color: var(--accent); font-weight: 700; }
+    .sg-sheet-cards { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .sg-sheet-card { padding: 6px 14px; border: 1px solid var(--border); font-size: 11px; background: var(--surface2); color: var(--muted); }
+    .sg-sheet-card b { color: var(--accent); }
+    .sg-preview-tbl { width: 100%; border-collapse: collapse; font-size: 11px; font-family: 'Space Mono', monospace; }
+    .sg-preview-tbl td, .sg-preview-tbl th { padding: 4px 8px; border: 1px solid var(--border); color: var(--text); }
+    .sg-preview-tbl .r-title td { text-align: center; font-weight: 700; background: var(--surface2); color: var(--accent); font-size: 12px; }
+    .sg-preview-tbl .r-header th { background: var(--accent); color: #000; font-size: 10px; letter-spacing: 1px; text-align: left; }
+    .sg-preview-tbl .r-sl td { color: var(--muted); font-size: 10px; }
+    .sg-divider { height: 1px; background: var(--border); margin: 18px 0; }
   </style>
 </head>
 <body>
@@ -82,7 +103,7 @@
 <header>
   <div class="top-badge">DEV TOOLKIT</div>
   <h1>The <span>Utility</span> Kit</h1>
-  <p class="subtitle">// 17 tools · no data leaves your browser · github pages deployable</p>
+  <p class="subtitle">// 18 tools · no data leaves your browser · github pages deployable</p>
 </header>
 
 <div class="nav-wrap">
@@ -115,9 +136,15 @@
     <button class="nav-btn" onclick="switchTool('date',this)">Date Difference</button>
     <button class="nav-btn" onclick="switchTool('unit',this)">Unit Converter</button>
   </div>
+  <div class="nav-group-label">Sheet Tools</div>
+  <div class="nav-row">
+    <button class="nav-btn" onclick="switchTool('sheetgen',this)">📊 Sheet Generator</button>
+  </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════ -->
 <!-- PHONE -->
+<!-- ═══════════════════════════════════════════════════════ -->
 <div class="tool-panel active" id="tool-phone">
   <div class="tool-title">Phone Number Formatter</div>
   <div class="tool-desc">// paste messy numbers → clean E.164 format with country codes</div>
@@ -150,7 +177,9 @@
   <div class="errors-panel" id="ph-errors"><strong>SKIPPED:</strong><ul id="ph-errors-list"></ul></div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════ -->
 <!-- CSV JSON -->
+<!-- ═══════════════════════════════════════════════════════ -->
 <div class="tool-panel" id="tool-csv">
   <div class="tool-title">CSV ↔ JSON Converter</div>
   <div class="tool-desc">// paste CSV to get JSON array, or paste JSON array to get CSV</div>
@@ -172,7 +201,9 @@
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════ -->
 <!-- JSON FORMATTER -->
+<!-- ═══════════════════════════════════════════════════════ -->
 <div class="tool-panel" id="tool-json">
   <div class="tool-title">JSON Formatter & Validator</div>
   <div class="tool-desc">// prettify, minify and validate JSON</div>
@@ -195,7 +226,9 @@
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════ -->
 <!-- TIMESTAMP -->
+<!-- ═══════════════════════════════════════════════════════ -->
 <div class="tool-panel" id="tool-timestamp">
   <div class="tool-title">Timestamp & Timezone Converter</div>
   <div class="tool-desc">// convert Unix timestamps, ISO dates and see world timezones</div>
@@ -222,7 +255,9 @@
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════ -->
 <!-- CASE -->
+<!-- ═══════════════════════════════════════════════════════ -->
 <div class="tool-panel" id="tool-case">
   <div class="tool-title">Case Converter</div>
   <div class="tool-desc">// transform text between naming conventions — click any result to copy</div>
@@ -233,7 +268,9 @@
   <div id="case-results" style="display:grid;grid-template-columns:1fr 1fr;gap:12px"></div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════ -->
 <!-- REGEX -->
+<!-- ═══════════════════════════════════════════════════════ -->
 <div class="tool-panel" id="tool-regex">
   <div class="tool-title">Regex Tester</div>
   <div class="tool-desc">// write a pattern, paste text, see matches live</div>
@@ -262,7 +299,9 @@
   <div class="stat-row"><span>MATCHES <span class="stat-val" id="rx-count">0</span></span></div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════ -->
 <!-- WORD COUNT -->
+<!-- ═══════════════════════════════════════════════════════ -->
 <div class="tool-panel" id="tool-wordcount">
   <div class="tool-title">Word & Character Counter</div>
   <div class="tool-desc">// words, chars, sentences, reading time — live</div>
@@ -273,7 +312,9 @@
   <div id="wc-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px"></div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════ -->
 <!-- QR -->
+<!-- ═══════════════════════════════════════════════════════ -->
 <div class="tool-panel" id="tool-qr">
   <div class="tool-title">QR Code Generator</div>
   <div class="tool-desc">// scannable QR codes for URLs, text, phone numbers</div>
@@ -295,7 +336,9 @@
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════ -->
 <!-- PASSWORD -->
+<!-- ═══════════════════════════════════════════════════════ -->
 <div class="tool-panel" id="tool-password">
   <div class="tool-title">Password Generator</div>
   <div class="tool-desc">// cryptographically random, configurable passwords</div>
@@ -315,7 +358,9 @@
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════ -->
 <!-- LOREM -->
+<!-- ═══════════════════════════════════════════════════════ -->
 <div class="tool-panel" id="tool-lorem">
   <div class="tool-title">Lorem Ipsum Generator</div>
   <div class="tool-desc">// dummy placeholder text for designs and mockups</div>
@@ -339,7 +384,9 @@
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════ -->
 <!-- UUID -->
+<!-- ═══════════════════════════════════════════════════════ -->
 <div class="tool-panel" id="tool-uuid">
   <div class="tool-title">UUID & Random ID Generator</div>
   <div class="tool-desc">// UUID v4, hex IDs, nano IDs — one click copy</div>
@@ -365,7 +412,9 @@
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════ -->
 <!-- COLOR -->
+<!-- ═══════════════════════════════════════════════════════ -->
 <div class="tool-panel" id="tool-color">
   <div class="tool-title">Color Format Converter</div>
   <div class="tool-desc">// HEX ↔ RGB ↔ HSL ↔ CMYK with live preview</div>
@@ -398,7 +447,9 @@
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════ -->
 <!-- EMI -->
+<!-- ═══════════════════════════════════════════════════════ -->
 <div class="tool-panel" id="tool-emi">
   <div class="tool-title">EMI / Loan Calculator</div>
   <div class="tool-desc">// monthly payment, total interest, full breakdown</div>
@@ -411,7 +462,9 @@
   <div class="result-card" id="emi-result" style="display:none"></div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════ -->
 <!-- GST -->
+<!-- ═══════════════════════════════════════════════════════ -->
 <div class="tool-panel" id="tool-gst">
   <div class="tool-title">GST Calculator</div>
   <div class="tool-desc">// add or remove GST at Indian tax rates</div>
@@ -434,7 +487,9 @@
   <div class="result-card" id="gst-result" style="display:none"></div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════ -->
 <!-- DISCOUNT -->
+<!-- ═══════════════════════════════════════════════════════ -->
 <div class="tool-panel" id="tool-discount">
   <div class="tool-title">Discount & Markup Calculator</div>
   <div class="tool-desc">// sale price, profit margin, markup percentage</div>
@@ -456,7 +511,9 @@
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════ -->
 <!-- DATE -->
+<!-- ═══════════════════════════════════════════════════════ -->
 <div class="tool-panel" id="tool-date">
   <div class="tool-title">Date Difference Calculator</div>
   <div class="tool-desc">// days between dates, working days, age calculator</div>
@@ -474,7 +531,9 @@
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════ -->
 <!-- UNIT -->
+<!-- ═══════════════════════════════════════════════════════ -->
 <div class="tool-panel" id="tool-unit">
   <div class="tool-title">Unit Converter</div>
   <div class="tool-desc">// length, weight, temperature, area, volume</div>
@@ -499,7 +558,93 @@
   <div class="result-card" id="unit-result" style="display:none"></div>
 </div>
 
-<footer>github pages deployable · 17 tools · zero dependencies · no data leaves your browser</footer>
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SHEET GENERATOR ★ NEW ★ -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="tool-panel" id="tool-sheetgen">
+  <div class="tool-title">📊 Sheet Generator</div>
+  <div class="tool-desc">// paste numbers → choose how many sheets → downloads exact "YOU TUBE DATA AJISHA" layout</div>
+
+  <!-- STEP 1 -->
+  <div class="sg-step">
+    <div class="sg-step-num">1</div>
+    <div class="sg-step-body">
+      <div class="panel-label">PASTE PHONE NUMBERS — one per line</div>
+      <textarea id="sg-input" style="min-height:180px" placeholder="+919847249411&#10;+917510260683&#10;+919846448313&#10;+919846976560&#10;+919747877978&#10;..."></textarea>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="sg-step">
+    <div class="sg-step-num">2</div>
+    <div class="sg-step-body">
+      <div class="panel-label">HOW MANY SHEETS?</div>
+      <div class="sg-chips">
+        <div class="sg-chip" data-n="2" onclick="sgSetChip(this)">2</div>
+        <div class="sg-chip" data-n="3" onclick="sgSetChip(this)">3</div>
+        <div class="sg-chip active" data-n="4" onclick="sgSetChip(this)">4</div>
+        <div class="sg-chip" data-n="5" onclick="sgSetChip(this)">5</div>
+        <div class="sg-chip" data-n="6" onclick="sgSetChip(this)">6</div>
+        <div class="sg-chip" data-n="8" onclick="sgSetChip(this)">8</div>
+        <div class="sg-chip" data-n="10" onclick="sgSetChip(this)">10</div>
+        <div class="sg-custom">
+          <span style="font-size:11px;color:var(--muted)">Custom:</span>
+          <input type="number" id="sg-custom-n" min="1" max="100" placeholder="e.g. 7" style="width:80px" oninput="sgClearChips();sgUpdateHint()">
+        </div>
+      </div>
+      <div class="sg-hint" id="sg-hint">— paste numbers above to see the split</div>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="sg-step">
+    <div class="sg-step-num">3</div>
+    <div class="sg-step-body">
+      <div class="panel-label">SHEET TAB NAME</div>
+      <div class="field-row">
+        <input type="text" id="sg-tab" value="Ajisha - WhatsApp" style="width:230px">
+        <span style="font-size:11px;color:var(--muted)">→ "… 1", "… 2", "… 3" …</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sg-divider"></div>
+
+  <div class="controls-row">
+    <button class="btn btn-primary" onclick="sgGenerate()" style="font-size:12px;padding:11px 28px">⬇ GENERATE & DOWNLOAD</button>
+    <button class="btn btn-sec" onclick="sgClear()">CLEAR</button>
+  </div>
+
+  <!-- Stats -->
+  <div class="stat-row" id="sg-stats" style="display:none">
+    <span>TOTAL <span class="stat-val" id="sg-s-total">0</span></span>
+    <span>VALID <span class="stat-val" id="sg-s-valid">0</span></span>
+    <span class="stat-err">SKIPPED <span class="stat-val stat-err" id="sg-s-skip">0</span></span>
+    <span>SHEETS <span class="stat-val" id="sg-s-sheets">0</span></span>
+    <span>~PER SHEET <span class="stat-val" id="sg-s-per">0</span></span>
+  </div>
+
+  <div class="errors-panel" id="sg-errors"><strong>SKIPPED (invalid):</strong><ul id="sg-errors-list"></ul></div>
+
+  <!-- Preview -->
+  <div id="sg-preview" style="display:none">
+    <div class="sg-divider"></div>
+    <div class="panel-label">SHEETS IN YOUR FILE</div>
+    <div class="sg-sheet-cards" id="sg-sheet-cards"></div>
+    <div class="panel-label" style="margin-top:4px">PREVIEW — SHEET 1 (first 8 entries)</div>
+    <div style="overflow-x:auto">
+      <table class="sg-preview-tbl" id="sg-preview-tbl"></table>
+    </div>
+    <div style="font-size:10px;color:var(--muted);margin-top:8px">↑ preview only · full file has been downloaded</div>
+  </div>
+</div>
+
+<footer>github pages deployable · 18 tools · zero dependencies · no data leaves your browser</footer>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- XLSX LIB (only loaded when Sheet Generator is used) -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <script>
 // ── NAV ──────────────────────────────────────────────
@@ -523,7 +668,7 @@ function genericCopy(outId, btnId) {
 function buildResultCard(id, rows) {
   const el = document.getElementById(id);
   el.style.display = 'block';
-  el.innerHTML = rows.map(([k,v]) =>
+  el.innerHTML = rows.map(([k, v]) =>
     `<div class="result-row"><span class="result-key">${k}</span><span class="result-val">${v}</span></div>`
   ).join('');
 }
@@ -540,21 +685,21 @@ function phSetSep(btn) {
 function phCustomSep(el) {
   if (el.value) { document.querySelectorAll('#tool-phone .sep-btn').forEach(b => b.classList.remove('active')); phSep = el.value; phFormat(); }
 }
-function parsePhone(raw) {
+function parsePhoneRaw(raw) {
   const t = raw.trim(); if (!t) return null;
-  const d = t.replace(/\D/g,'');
-  if (d.length < 7) return { error:true, raw:t };
-  if (t.startsWith('+')) { const a = t.slice(1).replace(/\D/g,''); return (a.length<7||a.length>15)?{error:true,raw:t}:{formatted:'+'+a}; }
-  if (d.startsWith('00') && d.length >= 9) return { formatted:'+'+d.slice(2) };
-  if (d.length===10 && /^[6-9]/.test(d)) return { formatted:'+91'+d };
-  if (d.length===12 && d.startsWith('91')) return { formatted:'+'+d };
-  if (d.length===11 && d.startsWith('0')) return { formatted:'+91'+d.slice(1) };
-  return { error:true, raw:t };
+  const d = t.replace(/\D/g, '');
+  if (d.length < 7) return { error: true, raw: t };
+  if (t.startsWith('+')) { const a = t.slice(1).replace(/\D/g, ''); return (a.length < 7 || a.length > 15) ? { error: true, raw: t } : { formatted: '+' + a }; }
+  if (d.startsWith('00') && d.length >= 9) return { formatted: '+' + d.slice(2) };
+  if (d.length === 10 && /^[6-9]/.test(d)) return { formatted: '+91' + d };
+  if (d.length === 12 && d.startsWith('91')) return { formatted: '+' + d };
+  if (d.length === 11 && d.startsWith('0')) return { formatted: '+91' + d.slice(1) };
+  return { error: true, raw: t };
 }
 function phFormat() {
-  const lines = document.getElementById('ph-input').value.split('\n').filter(l=>l.trim());
-  const results=[], errors=[];
-  lines.forEach(l => { const r=parsePhone(l); if(!r) return; r.error?errors.push(r.raw):results.push(r.formatted); });
+  const lines = document.getElementById('ph-input').value.split('\n').filter(l => l.trim());
+  const results = [], errors = [];
+  lines.forEach(l => { const r = parsePhoneRaw(l); if (!r) return; r.error ? errors.push(r.raw) : results.push(r.formatted); });
   const out = document.getElementById('ph-output');
   if (results.length) { out.textContent = results.join(phSep); }
   else { out.innerHTML = '<span class="ph">// no valid numbers found</span>'; }
@@ -563,27 +708,27 @@ function phFormat() {
   document.getElementById('ph-skipped').textContent = errors.length;
   const ep = document.getElementById('ph-errors'), el = document.getElementById('ph-errors-list');
   el.innerHTML = '';
-  errors.forEach(e => { const li=document.createElement('li'); li.textContent=e; el.appendChild(li); });
+  errors.forEach(e => { const li = document.createElement('li'); li.textContent = e; el.appendChild(li); });
   ep.classList.toggle('visible', errors.length > 0);
 }
 function phClear() {
   document.getElementById('ph-input').value = '';
   document.getElementById('ph-output').innerHTML = '<span class="ph">// formatted numbers appear here</span>';
-  ['ph-total','ph-valid','ph-skipped'].forEach(id => document.getElementById(id).textContent='0');
+  ['ph-total', 'ph-valid', 'ph-skipped'].forEach(id => document.getElementById(id).textContent = '0');
   document.getElementById('ph-errors').classList.remove('visible');
 }
 let phTimer;
-document.getElementById('ph-input').addEventListener('input', () => { clearTimeout(phTimer); phTimer=setTimeout(phFormat,400); });
+document.getElementById('ph-input').addEventListener('input', () => { clearTimeout(phTimer); phTimer = setTimeout(phFormat, 400); });
 
 // ── CSV ↔ JSON ────────────────────────────────────────
 function csvToJson() {
-  const lines = document.getElementById('csv-input').value.trim().split('\n').filter(l=>l.trim());
-  if (lines.length < 2) { document.getElementById('csv-output').textContent='// need header + at least 1 data row'; return; }
-  const headers = lines[0].split(',').map(h=>h.trim());
+  const lines = document.getElementById('csv-input').value.trim().split('\n').filter(l => l.trim());
+  if (lines.length < 2) { document.getElementById('csv-output').textContent = '// need header + at least 1 data row'; return; }
+  const headers = lines[0].split(',').map(h => h.trim());
   const rows = lines.slice(1).map(l => {
-    const vals = l.split(',').map(v=>v.trim());
-    const obj={};
-    headers.forEach((h,i) => { const v=vals[i]||''; obj[h]=v!==''&&!isNaN(v)?Number(v):v; });
+    const vals = l.split(',').map(v => v.trim());
+    const obj = {};
+    headers.forEach((h, i) => { const v = vals[i] || ''; obj[h] = v !== '' && !isNaN(v) ? Number(v) : v; });
     return obj;
   });
   document.getElementById('csv-output').textContent = JSON.stringify(rows, null, 2);
@@ -591,11 +736,11 @@ function csvToJson() {
 function jsonToCsv() {
   try {
     const data = JSON.parse(document.getElementById('csv-input').value.trim());
-    if (!Array.isArray(data)||!data.length) throw new Error('Input must be a JSON array');
+    if (!Array.isArray(data) || !data.length) throw new Error('Input must be a JSON array');
     const headers = Object.keys(data[0]);
-    const rows = [headers.join(','), ...data.map(r => headers.map(h => JSON.stringify(r[h]??'')).join(','))];
+    const rows = [headers.join(','), ...data.map(r => headers.map(h => JSON.stringify(r[h] ?? '')).join(','))];
     document.getElementById('csv-output').textContent = rows.join('\n');
-  } catch(e) { document.getElementById('csv-output').textContent = '// error: '+e.message; }
+  } catch (e) { document.getElementById('csv-output').textContent = '// error: ' + e.message; }
 }
 
 // ── JSON FORMATTER ────────────────────────────────────
@@ -604,34 +749,34 @@ function jsonOp(op) {
   const out = document.getElementById('json-output');
   try {
     const parsed = JSON.parse(val);
-    if (op==='pretty') out.textContent = JSON.stringify(parsed,null,2);
-    else if (op==='mini') out.textContent = JSON.stringify(parsed);
-    else out.textContent = '✓ Valid JSON — '+typeof parsed;
-  } catch(e) { out.textContent = '✗ Invalid JSON: '+e.message; }
+    if (op === 'pretty') out.textContent = JSON.stringify(parsed, null, 2);
+    else if (op === 'mini') out.textContent = JSON.stringify(parsed);
+    else out.textContent = '✓ Valid JSON — ' + typeof parsed;
+  } catch (e) { out.textContent = '✗ Invalid JSON: ' + e.message; }
 }
 
 // ── TIMESTAMP ─────────────────────────────────────────
 function tsFromUnix() {
   const v = parseInt(document.getElementById('ts-unix').value);
   if (isNaN(v)) return;
-  const d = new Date(v*1000);
-  const el = document.getElementById('ts-r1'); el.style.display='block';
-  el.innerHTML = [['UTC',d.toUTCString()],['ISO 8601',d.toISOString()],['Local',d.toLocaleString()]]
-    .map(([k,v])=>`<div class="result-row"><span class="result-key">${k}</span><span class="result-val" style="font-size:11px">${v}</span></div>`).join('');
+  const d = new Date(v * 1000);
+  const el = document.getElementById('ts-r1'); el.style.display = 'block';
+  el.innerHTML = [['UTC', d.toUTCString()], ['ISO 8601', d.toISOString()], ['Local', d.toLocaleString()]]
+    .map(([k, v]) => `<div class="result-row"><span class="result-key">${k}</span><span class="result-val" style="font-size:11px">${v}</span></div>`).join('');
 }
 function tsFromDate() {
   const d = new Date(document.getElementById('ts-date').value);
   if (isNaN(d.getTime())) return;
-  const el = document.getElementById('ts-r2'); el.style.display='block';
-  el.innerHTML = [['Unix (s)',Math.floor(d.getTime()/1000)],['Unix (ms)',d.getTime()],['ISO 8601',d.toISOString()]]
-    .map(([k,v])=>`<div class="result-row"><span class="result-key">${k}</span><span class="result-val">${v}</span></div>`).join('');
+  const el = document.getElementById('ts-r2'); el.style.display = 'block';
+  el.innerHTML = [['Unix (s)', Math.floor(d.getTime() / 1000)], ['Unix (ms)', d.getTime()], ['ISO 8601', d.toISOString()]]
+    .map(([k, v]) => `<div class="result-row"><span class="result-key">${k}</span><span class="result-val">${v}</span></div>`).join('');
 }
 function tsRefresh() {
-  const zones = [['UTC','UTC'],['India (IST)','Asia/Kolkata'],['UAE (GST)','Asia/Dubai'],['London','Europe/London'],['New York','America/New_York'],['Singapore','Asia/Singapore'],['Tokyo','Asia/Tokyo']];
+  const zones = [['UTC', 'UTC'], ['India (IST)', 'Asia/Kolkata'], ['UAE (GST)', 'Asia/Dubai'], ['London', 'Europe/London'], ['New York', 'America/New_York'], ['Singapore', 'Asia/Singapore'], ['Tokyo', 'Asia/Tokyo']];
   const now = new Date();
-  document.getElementById('ts-zones').innerHTML = zones.map(([label,tz]) => {
-    const t = now.toLocaleTimeString('en-US',{timeZone:tz,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
-    const d = now.toLocaleDateString('en-IN',{timeZone:tz,day:'2-digit',month:'short',year:'numeric'});
+  document.getElementById('ts-zones').innerHTML = zones.map(([label, tz]) => {
+    const t = now.toLocaleTimeString('en-US', { timeZone: tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+    const d = now.toLocaleDateString('en-IN', { timeZone: tz, day: '2-digit', month: 'short', year: 'numeric' });
     return `<div class="result-row"><span class="result-key">${label}</span><span class="result-val">${d} · ${t}</span></div>`;
   }).join('');
 }
@@ -639,24 +784,24 @@ tsRefresh();
 
 // ── CASE CONVERTER ────────────────────────────────────
 const caseFns = [
-  ['camelCase', s => s.trim().toLowerCase().replace(/[^a-z0-9]+(.)/gi,(_,c)=>c.toUpperCase())],
-  ['PascalCase', s => s.trim().replace(/[^a-z0-9]+(.)/gi,(_,c)=>c.toUpperCase()).replace(/^./,c=>c.toUpperCase())],
-  ['snake_case', s => s.trim().toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'')],
-  ['SCREAMING_SNAKE', s => s.trim().toUpperCase().replace(/\s+/g,'_').replace(/[^A-Z0-9_]/g,'')],
-  ['kebab-case', s => s.trim().toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'')],
+  ['camelCase', s => s.trim().toLowerCase().replace(/[^a-z0-9]+(.)/gi, (_, c) => c.toUpperCase())],
+  ['PascalCase', s => s.trim().replace(/[^a-z0-9]+(.)/gi, (_, c) => c.toUpperCase()).replace(/^./, c => c.toUpperCase())],
+  ['snake_case', s => s.trim().toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '')],
+  ['SCREAMING_SNAKE', s => s.trim().toUpperCase().replace(/\s+/g, '_').replace(/[^A-Z0-9_]/g, '')],
+  ['kebab-case', s => s.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')],
   ['UPPER CASE', s => s.toUpperCase()],
   ['lower case', s => s.toLowerCase()],
-  ['Title Case', s => s.replace(/\w\S*/g, t=>t[0].toUpperCase()+t.slice(1).toLowerCase())],
-  ['Sentence case', s => s.charAt(0).toUpperCase()+s.slice(1).toLowerCase()],
-  ['dot.case', s => s.trim().toLowerCase().replace(/\s+/g,'.').replace(/[^a-z0-9.]/g,'')],
+  ['Title Case', s => s.replace(/\w\S*/g, t => t[0].toUpperCase() + t.slice(1).toLowerCase())],
+  ['Sentence case', s => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase()],
+  ['dot.case', s => s.trim().toLowerCase().replace(/\s+/g, '.').replace(/[^a-z0-9.]/g, '')],
 ];
 function caseConvert() {
   const input = document.getElementById('case-input').value;
   const container = document.getElementById('case-results');
-  if (!input.trim()) { container.innerHTML=''; return; }
+  if (!input.trim()) { container.innerHTML = ''; return; }
   container.innerHTML = caseFns.map(([label, fn]) => {
     const result = fn(input);
-    const safe = result.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    const safe = result.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
     return `<div class="panel" style="cursor:pointer" onclick="navigator.clipboard.writeText('${safe}')">
       <div class="panel-label">${label}</div>
       <div style="font-size:12px;color:var(--accent);word-break:break-all">${result}</div>
@@ -671,17 +816,17 @@ function rxTest() {
   const flags = document.getElementById('rx-flags').value;
   const text = document.getElementById('rx-input').value;
   const out = document.getElementById('rx-output');
-  if (!pattern||!text) { out.innerHTML='<span class="ph">// matches appear here</span>'; document.getElementById('rx-count').textContent='0'; return; }
+  if (!pattern || !text) { out.innerHTML = '<span class="ph">// matches appear here</span>'; document.getElementById('rx-count').textContent = '0'; return; }
   try {
     const rx = new RegExp(pattern, flags);
     const matches = [...text.matchAll(rx)];
     document.getElementById('rx-count').textContent = matches.length;
-    if (!matches.length) { out.textContent='// no matches found'; return; }
-    out.innerHTML = matches.map((m,i) => {
-      const groups = m.slice(1).length ? '\n  '+m.slice(1).map((g,j)=>`$${j+1}="${g}"`).join(', ') : '';
-      return `<span style="color:var(--muted)">Match ${i+1} @ pos ${m.index}:</span> <span style="color:var(--accent)">${m[0]}</span>${groups}`;
+    if (!matches.length) { out.textContent = '// no matches found'; return; }
+    out.innerHTML = matches.map((m, i) => {
+      const groups = m.slice(1).length ? '\n  ' + m.slice(1).map((g, j) => `$${j + 1}="${g}"`).join(', ') : '';
+      return `<span style="color:var(--muted)">Match ${i + 1} @ pos ${m.index}:</span> <span style="color:var(--accent)">${m[0]}</span>${groups}`;
     }).join('\n\n');
-  } catch(e) { out.textContent='// regex error: '+e.message; }
+  } catch (e) { out.textContent = '// regex error: ' + e.message; }
 }
 
 // ── WORD COUNT ────────────────────────────────────────
@@ -691,19 +836,19 @@ function wcCount() {
   const cards = [
     ['WORDS', words],
     ['CHARACTERS', t.length],
-    ['CHARS (no spaces)', t.replace(/\s/g,'').length],
-    ['SENTENCES', t.split(/[.!?]+/).filter(s=>s.trim()).length],
-    ['PARAGRAPHS', t.split(/\n+/).filter(p=>p.trim()).length],
-    ['READ TIME', Math.max(1,Math.round(words/200))+'m'],
+    ['CHARS (no spaces)', t.replace(/\s/g, '').length],
+    ['SENTENCES', t.split(/[.!?]+/).filter(s => s.trim()).length],
+    ['PARAGRAPHS', t.split(/\n+/).filter(p => p.trim()).length],
+    ['READ TIME', Math.max(1, Math.round(words / 200)) + 'm'],
   ];
-  document.getElementById('wc-cards').innerHTML = cards.map(([k,v]) =>
+  document.getElementById('wc-cards').innerHTML = cards.map(([k, v]) =>
     `<div class="panel" style="text-align:center"><div style="font-size:9px;color:var(--muted);letter-spacing:2px;margin-bottom:6px">${k}</div><div style="font-size:26px;font-weight:700;color:var(--accent);font-family:'Syne',sans-serif">${v}</div></div>`
   ).join('');
 }
 
 // ── QR CODE ───────────────────────────────────────────
 let qrTimer;
-function qrDebounce() { clearTimeout(qrTimer); qrTimer=setTimeout(qrGen,600); }
+function qrDebounce() { clearTimeout(qrTimer); qrTimer = setTimeout(qrGen, 600); }
 function qrGen() {
   const val = document.getElementById('qr-input').value.trim();
   const size = document.getElementById('qr-size').value;
@@ -714,152 +859,374 @@ function qrGen() {
 
 // ── PASSWORD ──────────────────────────────────────────
 function pwGen() {
-  const len=+document.getElementById('pw-len').value, qty=+document.getElementById('pw-qty').value;
-  let chars='';
-  if(document.getElementById('pw-upper').checked) chars+='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  if(document.getElementById('pw-lower').checked) chars+='abcdefghijklmnopqrstuvwxyz';
-  if(document.getElementById('pw-num').checked) chars+='0123456789';
-  if(document.getElementById('pw-sym').checked) chars+='!@#$%^&*()-_=+[]{}|;:,.<>?';
-  if(!chars) { document.getElementById('pw-output').textContent='// select at least one character type'; return; }
-  const passwords = Array.from({length:qty}, () =>
-    Array.from({length:len}, () => chars[Math.floor(Math.random()*chars.length)]).join('')
+  const len = +document.getElementById('pw-len').value, qty = +document.getElementById('pw-qty').value;
+  let chars = '';
+  if (document.getElementById('pw-upper').checked) chars += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  if (document.getElementById('pw-lower').checked) chars += 'abcdefghijklmnopqrstuvwxyz';
+  if (document.getElementById('pw-num').checked) chars += '0123456789';
+  if (document.getElementById('pw-sym').checked) chars += '!@#$%^&*()-_=+[]{}|;:,.<>?';
+  if (!chars) { document.getElementById('pw-output').textContent = '// select at least one character type'; return; }
+  const passwords = Array.from({ length: qty }, () =>
+    Array.from({ length: len }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
   );
   document.getElementById('pw-output').textContent = passwords.join('\n');
 }
 
 // ── LOREM IPSUM ───────────────────────────────────────
 const LW = 'lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua enim ad minim veniam quis nostrud exercitation ullamco laboris nisi aliquip ex ea commodo consequat duis aute irure reprehenderit voluptate velit esse cillum dolore eu fugiat nulla pariatur excepteur sint occaecat cupidatat non proident sunt culpa qui officia deserunt mollit anim id est laborum'.split(' ');
-const rw = () => LW[Math.floor(Math.random()*LW.length)];
-const rs = () => { const n=8+Math.floor(Math.random()*10); return Array.from({length:n},(_,i)=>{const w=rw();return i===0?w[0].toUpperCase()+w.slice(1):w;}).join(' ')+'.'; };
-const rp = () => Array.from({length:4+Math.floor(Math.random()*4)},rs).join(' ');
+const rw = () => LW[Math.floor(Math.random() * LW.length)];
+const rs = () => { const n = 8 + Math.floor(Math.random() * 10); return Array.from({ length: n }, (_, i) => { const w = rw(); return i === 0 ? w[0].toUpperCase() + w.slice(1) : w; }).join(' ') + '.'; };
+const rp = () => Array.from({ length: 4 + Math.floor(Math.random() * 4) }, rs).join(' ');
 function loremGen() {
-  const type=document.getElementById('lorem-type').value, count=+document.getElementById('lorem-count').value;
-  const result = type==='words'?Array.from({length:count},rw).join(' '):type==='sentences'?Array.from({length:count},rs).join(' '):Array.from({length:count},rp).join('\n\n');
-  document.getElementById('lorem-output').textContent=result;
+  const type = document.getElementById('lorem-type').value, count = +document.getElementById('lorem-count').value;
+  const result = type === 'words' ? Array.from({ length: count }, rw).join(' ') : type === 'sentences' ? Array.from({ length: count }, rs).join(' ') : Array.from({ length: count }, rp).join('\n\n');
+  document.getElementById('lorem-output').textContent = result;
 }
 
 // ── UUID ──────────────────────────────────────────────
-const NANO='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
-const genUUID4=()=>'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c==='x'?r:(r&0x3|0x8)).toString(16);});
-const genHex=n=>Array.from({length:n},()=>Math.floor(Math.random()*16).toString(16)).join('');
-const genNano=(n=21)=>Array.from({length:n},()=>NANO[Math.floor(Math.random()*64)]).join('');
-const genNum=()=>Array.from({length:10},(_,i)=>i===0?1+Math.floor(Math.random()*9):Math.floor(Math.random()*10)).join('');
+const NANO = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+const genUUID4 = () => 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16); });
+const genHex = n => Array.from({ length: n }, () => Math.floor(Math.random() * 16).toString(16)).join('');
+const genNano = (n = 21) => Array.from({ length: n }, () => NANO[Math.floor(Math.random() * 64)]).join('');
+const genNum = () => Array.from({ length: 10 }, (_, i) => i === 0 ? 1 + Math.floor(Math.random() * 9) : Math.floor(Math.random() * 10)).join('');
 function uuidGen() {
-  const type=document.getElementById('uuid-type').value, qty=+document.getElementById('uuid-qty').value;
-  const fn={uuid4:genUUID4,hex8:()=>genHex(8),hex16:()=>genHex(16),nano:genNano,num:genNum}[type];
-  document.getElementById('uuid-output').textContent=Array.from({length:qty},fn).join('\n');
+  const type = document.getElementById('uuid-type').value, qty = +document.getElementById('uuid-qty').value;
+  const fn = { uuid4: genUUID4, hex8: () => genHex(8), hex16: () => genHex(16), nano: genNano, num: genNum }[type];
+  document.getElementById('uuid-output').textContent = Array.from({ length: qty }, fn).join('\n');
 }
 
 // ── COLOR ─────────────────────────────────────────────
-function rgbToHsl(r,g,b){r/=255;g/=255;b/=255;const max=Math.max(r,g,b),min=Math.min(r,g,b);let h,s,l=(max+min)/2;if(max===min){h=s=0;}else{const d=max-min;s=l>0.5?d/(2-max-min):d/(max+min);switch(max){case r:h=(g-b)/d+(g<b?6:0);break;case g:h=(b-r)/d+2;break;default:h=(r-g)/d+4;}h/=6;}return[h*360,s*100,l*100];}
-function hslToRgb(h,s,l){h/=360;s/=100;l/=100;let r,g,b;if(!s){r=g=b=l;}else{const q=l<0.5?l*(1+s):l+s-l*s,p=2*l-q,hue2=(pp,qq,t)=>{if(t<0)t+=1;if(t>1)t-=1;if(t<1/6)return pp+(qq-pp)*6*t;if(t<1/2)return qq;if(t<2/3)return pp+(qq-pp)*(2/3-t)*6;return pp;};r=hue2(p,q,h+1/3);g=hue2(p,q,h);b=hue2(p,q,h-1/3);}return[Math.round(r*255),Math.round(g*255),Math.round(b*255)];}
-function rgbToCmyk(r,g,b){if(!r&&!g&&!b)return[0,0,0,100];r/=255;g/=255;b/=255;const k=1-Math.max(r,g,b);return[Math.round((1-r-k)/(1-k)*100),Math.round((1-g-k)/(1-k)*100),Math.round((1-b-k)/(1-k)*100),Math.round(k*100)];}
-function colUpdateAll(r,g,b){
-  const hex='#'+[r,g,b].map(v=>Math.max(0,Math.min(255,v)).toString(16).padStart(2,'0')).join('');
-  const [h,s,l]=rgbToHsl(r,g,b),cmyk=rgbToCmyk(r,g,b);
-  document.getElementById('col-hex').value=hex;
-  document.getElementById('col-r').value=r;document.getElementById('col-g').value=g;document.getElementById('col-b').value=b;
-  document.getElementById('col-h').value=Math.round(h);document.getElementById('col-s').value=Math.round(s);document.getElementById('col-l').value=Math.round(l);
-  document.getElementById('col-cmyk').textContent=`C:${cmyk[0]}% M:${cmyk[1]}% Y:${cmyk[2]}% K:${cmyk[3]}%`;
-  document.getElementById('col-preview').style.background=hex;
+function rgbToHsl(r, g, b) { r /= 255; g /= 255; b /= 255; const max = Math.max(r, g, b), min = Math.min(r, g, b); let h, s, l = (max + min) / 2; if (max === min) { h = s = 0; } else { const d = max - min; s = l > 0.5 ? d / (2 - max - min) : d / (max + min); switch (max) { case r: h = (g - b) / d + (g < b ? 6 : 0); break; case g: h = (b - r) / d + 2; break; default: h = (r - g) / d + 4; } h /= 6; } return [h * 360, s * 100, l * 100]; }
+function hslToRgb(h, s, l) { h /= 360; s /= 100; l /= 100; let r, g, b; if (!s) { r = g = b = l; } else { const q = l < 0.5 ? l * (1 + s) : l + s - l * s, p = 2 * l - q, hue2 = (pp, qq, t) => { if (t < 0) t += 1; if (t > 1) t -= 1; if (t < 1 / 6) return pp + (qq - pp) * 6 * t; if (t < 1 / 2) return qq; if (t < 2 / 3) return pp + (qq - pp) * (2 / 3 - t) * 6; return pp; }; r = hue2(p, q, h + 1 / 3); g = hue2(p, q, h); b = hue2(p, q, h - 1 / 3); } return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)]; }
+function rgbToCmyk(r, g, b) { if (!r && !g && !b) return [0, 0, 0, 100]; r /= 255; g /= 255; b /= 255; const k = 1 - Math.max(r, g, b); return [Math.round((1 - r - k) / (1 - k) * 100), Math.round((1 - g - k) / (1 - k) * 100), Math.round((1 - b - k) / (1 - k) * 100), Math.round(k * 100)]; }
+function colUpdateAll(r, g, b) {
+  const hex = '#' + [r, g, b].map(v => Math.max(0, Math.min(255, v)).toString(16).padStart(2, '0')).join('');
+  const [h, s, l] = rgbToHsl(r, g, b), cmyk = rgbToCmyk(r, g, b);
+  document.getElementById('col-hex').value = hex;
+  document.getElementById('col-r').value = r; document.getElementById('col-g').value = g; document.getElementById('col-b').value = b;
+  document.getElementById('col-h').value = Math.round(h); document.getElementById('col-s').value = Math.round(s); document.getElementById('col-l').value = Math.round(l);
+  document.getElementById('col-cmyk').textContent = `C:${cmyk[0]}% M:${cmyk[1]}% Y:${cmyk[2]}% K:${cmyk[3]}%`;
+  document.getElementById('col-preview').style.background = hex;
 }
-function colFromHex(){const hex=document.getElementById('col-hex').value.replace('#','');if(hex.length!==6)return;const r=parseInt(hex.slice(0,2),16),g=parseInt(hex.slice(2,4),16),b=parseInt(hex.slice(4,6),16);if(!isNaN(r))colUpdateAll(r,g,b);}
-function colFromRgb(){colUpdateAll(+document.getElementById('col-r').value,+document.getElementById('col-g').value,+document.getElementById('col-b').value);}
-function colFromHsl(){const[r,g,b]=hslToRgb(+document.getElementById('col-h').value,+document.getElementById('col-s').value,+document.getElementById('col-l').value);colUpdateAll(r,g,b);}
-function colSet(hex){document.getElementById('col-hex').value=hex;colFromHex();}
+function colFromHex() { const hex = document.getElementById('col-hex').value.replace('#', ''); if (hex.length !== 6) return; const r = parseInt(hex.slice(0, 2), 16), g = parseInt(hex.slice(2, 4), 16), b = parseInt(hex.slice(4, 6), 16); if (!isNaN(r)) colUpdateAll(r, g, b); }
+function colFromRgb() { colUpdateAll(+document.getElementById('col-r').value, +document.getElementById('col-g').value, +document.getElementById('col-b').value); }
+function colFromHsl() { const [r, g, b] = hslToRgb(+document.getElementById('col-h').value, +document.getElementById('col-s').value, +document.getElementById('col-l').value); colUpdateAll(r, g, b); }
+function colSet(hex) { document.getElementById('col-hex').value = hex; colFromHex(); }
 colSet('#3b82f6');
 
 // ── EMI ───────────────────────────────────────────────
-function emiCalc(){
-  const P=+document.getElementById('emi-p').value,r=+document.getElementById('emi-r').value/1200,n=+document.getElementById('emi-t').value;
-  if(!P||!r||!n)return;
-  const emi=P*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1),total=emi*n,interest=total-P;
-  buildResultCard('emi-result',[
-    ['Monthly EMI','₹'+emi.toLocaleString('en-IN',{maximumFractionDigits:2})],
-    ['Total Payable','₹'+total.toLocaleString('en-IN',{maximumFractionDigits:2})],
-    ['Principal','₹'+P.toLocaleString('en-IN')],
-    ['Total Interest','₹'+interest.toLocaleString('en-IN',{maximumFractionDigits:2})],
-    ['Tenure',n+' months ('+Math.round(n/12*10)/10+' yrs)'],
-    ['Interest % of Principal',((interest/P)*100).toFixed(1)+'%']
+function emiCalc() {
+  const P = +document.getElementById('emi-p').value, r = +document.getElementById('emi-r').value / 1200, n = +document.getElementById('emi-t').value;
+  if (!P || !r || !n) return;
+  const emi = P * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1), total = emi * n, interest = total - P;
+  buildResultCard('emi-result', [
+    ['Monthly EMI', '₹' + emi.toLocaleString('en-IN', { maximumFractionDigits: 2 })],
+    ['Total Payable', '₹' + total.toLocaleString('en-IN', { maximumFractionDigits: 2 })],
+    ['Principal', '₹' + P.toLocaleString('en-IN')],
+    ['Total Interest', '₹' + interest.toLocaleString('en-IN', { maximumFractionDigits: 2 })],
+    ['Tenure', n + ' months (' + Math.round(n / 12 * 10) / 10 + ' yrs)'],
+    ['Interest % of Principal', ((interest / P) * 100).toFixed(1) + '%']
   ]);
 }
 
 // ── GST ───────────────────────────────────────────────
-let gstMode='add';
-function gstCalc(){
-  const rateEl=document.getElementById('gst-rate'),amt=+document.getElementById('gst-amt').value;
-  const rate=rateEl.value==='custom'?+document.getElementById('gst-custom').value:+rateEl.value;
-  if(!amt||!rate)return;
-  if(gstMode==='add'){
-    const gstAmt=amt*rate/100,total=amt+gstAmt;
-    buildResultCard('gst-result',[['Base Amount (excl. GST)','₹'+amt.toLocaleString('en-IN')],['GST @ '+rate+'%','₹'+gstAmt.toLocaleString('en-IN',{maximumFractionDigits:2})],['Total (incl. GST)','₹'+total.toLocaleString('en-IN',{maximumFractionDigits:2})]]);
+let gstMode = 'add';
+function gstCalc() {
+  const rateEl = document.getElementById('gst-rate'), amt = +document.getElementById('gst-amt').value;
+  const rate = rateEl.value === 'custom' ? +document.getElementById('gst-custom').value : +rateEl.value;
+  if (!amt || !rate) return;
+  if (gstMode === 'add') {
+    const gstAmt = amt * rate / 100, total = amt + gstAmt;
+    buildResultCard('gst-result', [['Base Amount (excl. GST)', '₹' + amt.toLocaleString('en-IN')], ['GST @ ' + rate + '%', '₹' + gstAmt.toLocaleString('en-IN', { maximumFractionDigits: 2 })], ['Total (incl. GST)', '₹' + total.toLocaleString('en-IN', { maximumFractionDigits: 2 })]]);
   } else {
-    const base=amt*100/(100+rate),gstAmt=amt-base;
-    buildResultCard('gst-result',[['Total Amount (given)','₹'+amt.toLocaleString('en-IN')],['Base Amount (excl. GST)','₹'+base.toLocaleString('en-IN',{maximumFractionDigits:2})],['GST @ '+rate+'%','₹'+gstAmt.toLocaleString('en-IN',{maximumFractionDigits:2})]]);
+    const base = amt * 100 / (100 + rate), gstAmt = amt - base;
+    buildResultCard('gst-result', [['Total Amount (given)', '₹' + amt.toLocaleString('en-IN')], ['Base Amount (excl. GST)', '₹' + base.toLocaleString('en-IN', { maximumFractionDigits: 2 })], ['GST @ ' + rate + '%', '₹' + gstAmt.toLocaleString('en-IN', { maximumFractionDigits: 2 })]]);
   }
 }
 
 // ── DISCOUNT / MARKUP ─────────────────────────────────
-function disCalc(){const orig=+document.getElementById('dis-orig').value,pct=+document.getElementById('dis-pct').value;const save=orig*pct/100,sale=orig-save;buildResultCard('dis-result',[['Original Price','₹'+orig.toLocaleString('en-IN')],['Discount @ '+pct+'%','₹'+save.toLocaleString('en-IN',{maximumFractionDigits:2})],['Sale Price','₹'+sale.toLocaleString('en-IN',{maximumFractionDigits:2})]]);}
-function muCalc(){const cost=+document.getElementById('mu-cost').value,pct=+document.getElementById('mu-pct').value;const markup=cost*pct/100,price=cost+markup,margin=(markup/price*100).toFixed(1);buildResultCard('mu-result',[['Cost Price','₹'+cost.toLocaleString('en-IN')],['Markup @ '+pct+'%','₹'+markup.toLocaleString('en-IN',{maximumFractionDigits:2})],['Selling Price','₹'+price.toLocaleString('en-IN',{maximumFractionDigits:2})],['Profit Margin',margin+'%']]);}
+function disCalc() { const orig = +document.getElementById('dis-orig').value, pct = +document.getElementById('dis-pct').value; const save = orig * pct / 100, sale = orig - save; buildResultCard('dis-result', [['Original Price', '₹' + orig.toLocaleString('en-IN')], ['Discount @ ' + pct + '%', '₹' + save.toLocaleString('en-IN', { maximumFractionDigits: 2 })], ['Sale Price', '₹' + sale.toLocaleString('en-IN', { maximumFractionDigits: 2 })]]); }
+function muCalc() { const cost = +document.getElementById('mu-cost').value, pct = +document.getElementById('mu-pct').value; const markup = cost * pct / 100, price = cost + markup, margin = (markup / price * 100).toFixed(1); buildResultCard('mu-result', [['Cost Price', '₹' + cost.toLocaleString('en-IN')], ['Markup @ ' + pct + '%', '₹' + markup.toLocaleString('en-IN', { maximumFractionDigits: 2 })], ['Selling Price', '₹' + price.toLocaleString('en-IN', { maximumFractionDigits: 2 })], ['Profit Margin', margin + '%']]); }
 
 // ── DATE DIFF ─────────────────────────────────────────
-const todayStr=new Date().toISOString().split('T')[0];
-document.getElementById('dt-start').value=todayStr;
-document.getElementById('dt-end').value=todayStr;
-document.getElementById('age-dob').value='1990-01-01';
-function dtCalc(){
-  const s=new Date(document.getElementById('dt-start').value),e=new Date(document.getElementById('dt-end').value);
-  const diff=Math.abs(e-s),days=Math.floor(diff/86400000);
-  let working=0,d=new Date(Math.min(+s,+e));
-  for(let i=0;i<days;i++){d.setDate(d.getDate()+1);if(d.getDay()!==0&&d.getDay()!==6)working++;}
-  buildResultCard('dt-result',[['Total Days',days.toLocaleString()],['Working Days',working.toLocaleString()],['Weekends',(days-working).toLocaleString()],['Weeks',Math.floor(days/7)],['Approx Months',Math.round(days/30.44)],['Approx Years',(days/365.25).toFixed(2)]]);
+const todayStr = new Date().toISOString().split('T')[0];
+document.getElementById('dt-start').value = todayStr;
+document.getElementById('dt-end').value = todayStr;
+document.getElementById('age-dob').value = '1990-01-01';
+function dtCalc() {
+  const s = new Date(document.getElementById('dt-start').value), e = new Date(document.getElementById('dt-end').value);
+  const diff = Math.abs(e - s), days = Math.floor(diff / 86400000);
+  let working = 0, d = new Date(Math.min(+s, +e));
+  for (let i = 0; i < days; i++) { d.setDate(d.getDate() + 1); if (d.getDay() !== 0 && d.getDay() !== 6) working++; }
+  buildResultCard('dt-result', [['Total Days', days.toLocaleString()], ['Working Days', working.toLocaleString()], ['Weekends', (days - working).toLocaleString()], ['Weeks', Math.floor(days / 7)], ['Approx Months', Math.round(days / 30.44)], ['Approx Years', (days / 365.25).toFixed(2)]]);
 }
-function ageCalc(){
-  const dob=new Date(document.getElementById('age-dob').value),now=new Date();
-  let y=now.getFullYear()-dob.getFullYear(),m=now.getMonth()-dob.getMonth(),d=now.getDate()-dob.getDate();
-  if(d<0){m--;d+=new Date(now.getFullYear(),now.getMonth(),0).getDate();}
-  if(m<0){y--;m+=12;}
-  const totalDays=Math.floor((now-dob)/86400000);
-  const nextBD=new Date(now.getFullYear(),dob.getMonth(),dob.getDate());
-  if(nextBD<=now)nextBD.setFullYear(now.getFullYear()+1);
-  const daysToNext=Math.ceil((nextBD-now)/86400000);
-  buildResultCard('age-result',[['Age',y+' years, '+m+' months, '+d+' days'],['Total Days',totalDays.toLocaleString()],['Total Weeks',Math.floor(totalDays/7).toLocaleString()],['Next Birthday',nextBD.toDateString()+' (in '+daysToNext+' days)']]);
+function ageCalc() {
+  const dob = new Date(document.getElementById('age-dob').value), now = new Date();
+  let y = now.getFullYear() - dob.getFullYear(), m = now.getMonth() - dob.getMonth(), d = now.getDate() - dob.getDate();
+  if (d < 0) { m--; d += new Date(now.getFullYear(), now.getMonth(), 0).getDate(); }
+  if (m < 0) { y--; m += 12; }
+  const totalDays = Math.floor((now - dob) / 86400000);
+  const nextBD = new Date(now.getFullYear(), dob.getMonth(), dob.getDate());
+  if (nextBD <= now) nextBD.setFullYear(now.getFullYear() + 1);
+  const daysToNext = Math.ceil((nextBD - now) / 86400000);
+  buildResultCard('age-result', [['Age', y + ' years, ' + m + ' months, ' + d + ' days'], ['Total Days', totalDays.toLocaleString()], ['Total Weeks', Math.floor(totalDays / 7).toLocaleString()], ['Next Birthday', nextBD.toDateString() + ' (in ' + daysToNext + ' days)']]);
 }
 
 // ── UNIT CONVERTER ────────────────────────────────────
-const unitData={
-  length:{units:['mm','cm','m','km','inch','foot','yard','mile'],base:{mm:0.001,cm:0.01,m:1,km:1000,inch:0.0254,foot:0.3048,yard:0.9144,mile:1609.344}},
-  weight:{units:['mg','g','kg','tonne','oz','lb'],base:{mg:0.000001,g:0.001,kg:1,tonne:1000,oz:0.0283495,lb:0.453592}},
-  temperature:{units:['°C','°F','K'],base:null},
-  area:{units:['mm²','cm²','m²','km²','acre','hectare','sqft','sqyard'],base:{'mm²':0.000001,'cm²':0.0001,'m²':1,'km²':1000000,'acre':4046.86,'hectare':10000,'sqft':0.092903,'sqyard':0.836127}},
-  volume:{units:['ml','l','m³','tsp','tbsp','cup','fl_oz','gallon'],base:{ml:0.001,l:1,'m³':1000,tsp:0.00492892,tbsp:0.0147868,cup:0.236588,fl_oz:0.0295735,gallon:3.78541}},
+const unitData = {
+  length: { units: ['mm', 'cm', 'm', 'km', 'inch', 'foot', 'yard', 'mile'], base: { mm: 0.001, cm: 0.01, m: 1, km: 1000, inch: 0.0254, foot: 0.3048, yard: 0.9144, mile: 1609.344 } },
+  weight: { units: ['mg', 'g', 'kg', 'tonne', 'oz', 'lb'], base: { mg: 0.000001, g: 0.001, kg: 1, tonne: 1000, oz: 0.0283495, lb: 0.453592 } },
+  temperature: { units: ['°C', '°F', 'K'], base: null },
+  area: { units: ['mm²', 'cm²', 'm²', 'km²', 'acre', 'hectare', 'sqft', 'sqyard'], base: { 'mm²': 0.000001, 'cm²': 0.0001, 'm²': 1, 'km²': 1000000, 'acre': 4046.86, 'hectare': 10000, 'sqft': 0.092903, 'sqyard': 0.836127 } },
+  volume: { units: ['ml', 'l', 'm³', 'tsp', 'tbsp', 'cup', 'fl_oz', 'gallon'], base: { ml: 0.001, l: 1, 'm³': 1000, tsp: 0.00492892, tbsp: 0.0147868, cup: 0.236588, fl_oz: 0.0295735, gallon: 3.78541 } },
 };
-function unitUpdateUnits(){
-  const cat=document.getElementById('unit-cat').value,{units}=unitData[cat];
-  ['unit-from','unit-to'].forEach((id,i)=>{
-    const sel=document.getElementById(id);
-    sel.innerHTML=units.map((u,j)=>`<option value="${u}"${(i===0&&j===units.length-2)||(i===1&&j===units.length-3)?' selected':''}>${u}</option>`).join('');
+function unitUpdateUnits() {
+  const cat = document.getElementById('unit-cat').value, { units } = unitData[cat];
+  ['unit-from', 'unit-to'].forEach((id, i) => {
+    const sel = document.getElementById(id);
+    sel.innerHTML = units.map((u, j) => `<option value="${u}"${(i === 0 && j === units.length - 2) || (i === 1 && j === units.length - 3) ? ' selected' : ''}>${u}</option>`).join('');
   });
   unitConvert();
 }
-function unitConvert(){
-  const cat=document.getElementById('unit-cat').value;
-  const val=+document.getElementById('unit-val').value;
-  const from=document.getElementById('unit-from').value,to=document.getElementById('unit-to').value;
+function unitConvert() {
+  const cat = document.getElementById('unit-cat').value;
+  const val = +document.getElementById('unit-val').value;
+  const from = document.getElementById('unit-from').value, to = document.getElementById('unit-to').value;
   let result;
-  if(cat==='temperature'){
+  if (cat === 'temperature') {
     let c;
-    if(from==='°C')c=val;else if(from==='°F')c=(val-32)*5/9;else c=val-273.15;
-    result=to==='°C'?c:to==='°F'?c*9/5+32:c+273.15;
+    if (from === '°C') c = val; else if (from === '°F') c = (val - 32) * 5 / 9; else c = val - 273.15;
+    result = to === '°C' ? c : to === '°F' ? c * 9 / 5 + 32 : c + 273.15;
   } else {
-    const {base}=unitData[cat];
-    result=val*base[from]/base[to];
+    const { base } = unitData[cat];
+    result = val * base[from] / base[to];
   }
-  document.getElementById('unit-result').style.display='block';
-  document.getElementById('unit-result').innerHTML=`<div class="result-row"><span class="result-key" style="font-size:14px">${val} ${from}</span><span class="result-val" style="font-size:20px">${+result.toPrecision(8)} ${to}</span></div>`;
+  document.getElementById('unit-result').style.display = 'block';
+  document.getElementById('unit-result').innerHTML = `<div class="result-row"><span class="result-key" style="font-size:14px">${val} ${from}</span><span class="result-val" style="font-size:20px">${+result.toPrecision(8)} ${to}</span></div>`;
 }
 unitUpdateUnits();
+
+
+// ═══════════════════════════════════════════════════════
+// ── SHEET GENERATOR ────────────────────────────────────
+// ═══════════════════════════════════════════════════════
+let sgActiveSheets = 4;
+
+function sgSetChip(el) {
+  document.querySelectorAll('.sg-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  sgActiveSheets = parseInt(el.dataset.n);
+  document.getElementById('sg-custom-n').value = '';
+  sgUpdateHint();
+}
+
+function sgClearChips() {
+  document.querySelectorAll('.sg-chip').forEach(c => c.classList.remove('active'));
+  sgActiveSheets = 0;
+}
+
+function sgGetSheetCount() {
+  const cv = document.getElementById('sg-custom-n').value;
+  if (cv && parseInt(cv) > 0) return parseInt(cv);
+  return sgActiveSheets || 4;
+}
+
+function sgParsePhone(raw) {
+  const t = raw.trim(); if (!t) return null;
+  const d = t.replace(/\D/g, '');
+  if (d.length < 7) return { error: true, raw: t };
+  if (t.startsWith('+')) {
+    const a = t.slice(1).replace(/\D/g, '');
+    return (a.length < 7 || a.length > 15) ? { error: true, raw: t } : { formatted: '+' + a };
+  }
+  if (d.startsWith('00') && d.length >= 9) return { formatted: '+' + d.slice(2) };
+  if (d.length === 10 && /^[6-9]/.test(d)) return { formatted: '+91' + d };
+  if (d.length === 12 && d.startsWith('91')) return { formatted: '+' + d };
+  if (d.length === 11 && d.startsWith('0')) return { formatted: '+91' + d.slice(1) };
+  return { error: true, raw: t };
+}
+
+function sgCountValid() {
+  const lines = document.getElementById('sg-input').value.split('\n').filter(l => l.trim());
+  let v = 0;
+  lines.forEach(l => { const r = sgParsePhone(l); if (r && !r.error) v++; });
+  return v;
+}
+
+function sgUpdateHint() {
+  const v = sgCountValid();
+  const s = sgGetSheetCount();
+  const el = document.getElementById('sg-hint');
+  if (!v) { el.innerHTML = '— paste numbers above to see the split'; return; }
+  const per = Math.ceil(v / s);
+  el.innerHTML = `<span style="color:var(--accent);font-weight:700">${v}</span> numbers ÷ <span style="color:var(--accent);font-weight:700">${s}</span> sheets = ~<span style="color:var(--accent);font-weight:700">${per}</span> per sheet`;
+}
+
+document.getElementById('sg-input').addEventListener('input', sgUpdateHint);
+
+function sgBuildSheet(numbers, sheetTitle) {
+  const rows = [];
+  rows.push([sheetTitle, '', '', '', '']);   // Row 0 — merged title
+  rows.push(['SL', 'Phone', 'Course', 'DETAILS', '']); // Row 1 — headers
+  numbers.forEach((ph, i) => {
+    rows.push([i + 1, '', '', '', '']);   // SL row
+    rows.push(['', ph, '', '', '']);      // Phone row
+  });
+
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+
+  // Column widths (chars) matching screenshot
+  ws['!cols'] = [
+    { wch: 5 },   // A — SL
+    { wch: 20 },  // B — Phone
+    { wch: 13 },  // C — Course
+    { wch: 30 },  // D — DETAILS
+    { wch: 8 },   // E — empty
+  ];
+
+  // Merge title across A1:E1
+  ws['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 4 } }];
+
+  // Row heights matching screenshot (points)
+  const rowH = [{ hpt: 20 }, { hpt: 20 }]; // title + header
+  numbers.forEach(() => { rowH.push({ hpt: 15 }); rowH.push({ hpt: 18 }); });
+  ws['!rows'] = rowH;
+
+  // Title cell style
+  const tc = XLSX.utils.encode_cell({ r: 0, c: 0 });
+  if (ws[tc]) ws[tc].s = {
+    font: { bold: true, sz: 12, name: 'Calibri' },
+    alignment: { horizontal: 'center', vertical: 'center' }
+  };
+
+  // Header row styles
+  for (let c = 0; c < 5; c++) {
+    const ref = XLSX.utils.encode_cell({ r: 1, c });
+    if (ws[ref]) ws[ref].s = {
+      font: { bold: true, sz: 11, name: 'Calibri' },
+      alignment: { horizontal: c === 0 ? 'center' : 'left', vertical: 'center' },
+      border: {
+        top: { style: 'thin', color: { rgb: '000000' } },
+        bottom: { style: 'thin', color: { rgb: '000000' } },
+        left: { style: 'thin', color: { rgb: '000000' } },
+        right: { style: 'thin', color: { rgb: '000000' } }
+      }
+    };
+  }
+
+  // Entry rows
+  numbers.forEach((ph, i) => {
+    const slRow = 2 + i * 2;
+    const phRow = slRow + 1;
+
+    const slRef = XLSX.utils.encode_cell({ r: slRow, c: 0 });
+    if (ws[slRef]) ws[slRef].s = {
+      font: { bold: true, sz: 11, name: 'Calibri' },
+      alignment: { horizontal: 'right', vertical: 'bottom' }
+    };
+
+    const phRef = XLSX.utils.encode_cell({ r: phRow, c: 1 });
+    if (ws[phRef]) {
+      ws[phRef].s = { font: { sz: 11, name: 'Calibri' }, alignment: { horizontal: 'left', vertical: 'center' } };
+      ws[phRef].t = 's'; // force text so + prefix is preserved
+    }
+
+    // Light borders for entire row group
+    for (let c = 0; c < 5; c++) {
+      for (const r of [slRow, phRow]) {
+        const ref = XLSX.utils.encode_cell({ r, c });
+        if (!ws[ref]) ws[ref] = { t: 's', v: '' };
+        if (!ws[ref].s) ws[ref].s = {};
+        ws[ref].s.border = {
+          left: { style: 'thin', color: { rgb: 'CCCCCC' } },
+          right: { style: 'thin', color: { rgb: 'CCCCCC' } },
+          ...(r === phRow ? { bottom: { style: 'thin', color: { rgb: 'BBBBBB' } } } : {})
+        };
+      }
+    }
+  });
+
+  return ws;
+}
+
+function sgGenerate() {
+  const lines = document.getElementById('sg-input').value.split('\n').filter(l => l.trim());
+  const valid = [], errors = [];
+  lines.forEach(l => { const r = sgParsePhone(l); if (!r) return; r.error ? errors.push(r.raw) : valid.push(r.formatted); });
+
+  const numSheets = Math.min(sgGetSheetCount(), valid.length || 1);
+  const perSheet = Math.ceil(valid.length / numSheets);
+
+  // Stats
+  document.getElementById('sg-stats').style.display = 'flex';
+  document.getElementById('sg-s-total').textContent = lines.length;
+  document.getElementById('sg-s-valid').textContent = valid.length;
+  document.getElementById('sg-s-skip').textContent = errors.length;
+  document.getElementById('sg-s-sheets').textContent = numSheets;
+  document.getElementById('sg-s-per').textContent = perSheet;
+
+  // Errors
+  const errPanel = document.getElementById('sg-errors');
+  const errList = document.getElementById('sg-errors-list');
+  errList.innerHTML = '';
+  errors.forEach(e => { const li = document.createElement('li'); li.textContent = e; errList.appendChild(li); });
+  errPanel.classList.toggle('visible', errors.length > 0);
+
+  if (!valid.length) {
+    document.getElementById('sg-preview').style.display = 'none';
+    alert('No valid phone numbers found. Please check your input.');
+    return;
+  }
+
+  const tabBase = document.getElementById('sg-tab').value.trim() || 'Ajisha - WhatsApp';
+  const TITLE = 'YOU TUBE DATA AJISHA';
+
+  // Split into equal chunks
+  const chunks = [];
+  for (let i = 0; i < numSheets; i++) {
+    const chunk = valid.slice(i * perSheet, (i + 1) * perSheet);
+    if (chunk.length) chunks.push(chunk);
+  }
+
+  const wb = XLSX.utils.book_new();
+  const sheetMeta = [];
+
+  chunks.forEach((chunk, idx) => {
+    const tabName = (chunks.length === 1 ? tabBase : `${tabBase} ${idx + 1}`).slice(0, 31);
+    XLSX.utils.book_append_sheet(wb, sgBuildSheet(chunk, TITLE), tabName);
+    sheetMeta.push({ name: tabName, count: chunk.length });
+  });
+
+  XLSX.writeFile(wb, `${tabBase.replace(/[^a-z0-9_\-]/gi, '_')}.xlsx`, { cellStyles: true });
+
+  // Sheet cards
+  document.getElementById('sg-sheet-cards').innerHTML = sheetMeta.map(s =>
+    `<div class="sg-sheet-card">📄 ${s.name} — <b>${s.count}</b> numbers</div>`
+  ).join('');
+
+  // Preview table (first sheet, first 8)
+  const show = chunks[0].slice(0, 8);
+  let html = `<tr class="r-title"><td colspan="5">${TITLE}</td></tr>`;
+  html += `<tr class="r-header"><th>SL</th><th>Phone</th><th>Course</th><th>DETAILS</th><th></th></tr>`;
+  show.forEach((ph, i) => {
+    html += `<tr class="r-sl"><td style="text-align:right">${i + 1}</td><td></td><td></td><td></td><td></td></tr>`;
+    html += `<tr><td></td><td>${ph}</td><td></td><td></td><td></td></tr>`;
+  });
+  document.getElementById('sg-preview-tbl').innerHTML = html;
+  document.getElementById('sg-preview').style.display = 'block';
+}
+
+function sgClear() {
+  document.getElementById('sg-input').value = '';
+  document.getElementById('sg-custom-n').value = '';
+  document.getElementById('sg-stats').style.display = 'none';
+  document.getElementById('sg-errors').classList.remove('visible');
+  document.getElementById('sg-preview').style.display = 'none';
+  document.getElementById('sg-hint').innerHTML = '— paste numbers above to see the split';
+  document.querySelectorAll('.sg-chip').forEach(c => c.classList.remove('active'));
+  document.querySelector('.sg-chip[data-n="4"]').classList.add('active');
+  sgActiveSheets = 4;
+}
 </script>
 </body>
 </html>
