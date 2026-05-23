@@ -64,6 +64,7 @@
     .stat-row { display: flex; gap: 20px; flex-wrap: wrap; padding: 12px 14px; background: var(--surface); border: 1px solid var(--border); font-size: 11px; color: var(--muted); margin-top: 14px; align-items: center; }
     .stat-val { color: var(--accent); font-weight: 700; }
     .stat-err { color: var(--error); }
+    .stat-warn { color: #f59e0b; }
     .field-row { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
     .field-label { font-size: 11px; color: var(--muted); min-width: 120px; }
     .result-card { background: var(--surface); border: 1px solid var(--border); padding: 16px 20px; margin-top: 14px; }
@@ -96,6 +97,10 @@
     .sg-preview-tbl .r-header th { background: var(--accent); color: #000; font-size: 10px; letter-spacing: 1px; text-align: left; }
     .sg-preview-tbl .r-sl td { color: var(--muted); font-size: 10px; }
     .sg-divider { height: 1px; background: var(--border); margin: 18px 0; }
+    .dupes-panel { margin-top: 12px; padding: 12px; background: #1a1200; border: 1px solid #3a2800; font-size: 11px; color: #f59e0b; display: none; }
+    .dupes-panel.visible { display: block; }
+    .dupes-panel ul { list-style: none; margin-top: 4px; }
+    .dupes-panel li::before { content: '⊘ '; }
   </style>
 </head>
 <body>
@@ -529,7 +534,7 @@
 <!-- ═══════════════════════════════════════════════════════ -->
 <div class="tool-panel" id="tool-sheetgen">
   <div class="tool-title">📊 Sheet Generator</div>
-  <div class="tool-desc">// paste numbers → choose how many sheets → downloads exact "YOU TUBE DATA AJISHA" layout</div>
+  <div class="tool-desc">// paste numbers → choose how many sheets → downloads exact "YOU TUBE DATA AJISHA" layout · duplicates auto-removed</div>
 
   <div class="sg-step">
     <div class="sg-step-num">1</div>
@@ -582,11 +587,13 @@
     <span>TOTAL <span class="stat-val" id="sg-s-total">0</span></span>
     <span>VALID <span class="stat-val" id="sg-s-valid">0</span></span>
     <span class="stat-err">SKIPPED <span class="stat-val stat-err" id="sg-s-skip">0</span></span>
+    <span class="stat-warn">DUPES REMOVED <span class="stat-val stat-warn" id="sg-s-dupes">0</span></span>
     <span>SHEETS <span class="stat-val" id="sg-s-sheets">0</span></span>
     <span>~PER SHEET <span class="stat-val" id="sg-s-per">0</span></span>
   </div>
 
   <div class="errors-panel" id="sg-errors"><strong>SKIPPED (invalid):</strong><ul id="sg-errors-list"></ul></div>
+  <div class="dupes-panel" id="sg-dupes-panel"><strong>DUPLICATES REMOVED:</strong><ul id="sg-dupes-list"></ul></div>
 
   <div id="sg-preview" style="display:none">
     <div class="sg-divider"></div>
@@ -1006,8 +1013,12 @@ function sgParsePhone(raw) {
 
 function sgCountValid() {
   const lines = document.getElementById('sg-input').value.split('\n').filter(l => l.trim());
+  const seen = new Set();
   let v = 0;
-  lines.forEach(l => { const r = sgParsePhone(l); if (r && !r.error) v++; });
+  lines.forEach(l => {
+    const r = sgParsePhone(l);
+    if (r && !r.error && !seen.has(r.formatted)) { seen.add(r.formatted); v++; }
+  });
   return v;
 }
 
@@ -1017,7 +1028,7 @@ function sgUpdateHint() {
   const el = document.getElementById('sg-hint');
   if (!v) { el.innerHTML = '— paste numbers above to see the split'; return; }
   const per = Math.ceil(v / s);
-  el.innerHTML = `<span style="color:var(--accent);font-weight:700">${v}</span> numbers ÷ <span style="color:var(--accent);font-weight:700">${s}</span> sheets = ~<span style="color:var(--accent);font-weight:700">${per}</span> per sheet`;
+  el.innerHTML = `<span style="color:var(--accent);font-weight:700">${v}</span> unique numbers ÷ <span style="color:var(--accent);font-weight:700">${s}</span> sheets = ~<span style="color:var(--accent);font-weight:700">${per}</span> per sheet`;
 }
 
 document.getElementById('sg-input').addEventListener('input', sgUpdateHint);
@@ -1033,34 +1044,14 @@ function cs(fontBold, fontSize, hAlign, vAlign, fillRgb, borderObj) {
   return s;
 }
 
-// Standard thin border sides
 const BORDER_ALL_THIN = {
   top:    { style: 'thin', color: { rgb: '000000' } },
   bottom: { style: 'thin', color: { rgb: '000000' } },
   left:   { style: 'thin', color: { rgb: '000000' } },
   right:  { style: 'thin', color: { rgb: '000000' } }
 };
-const BORDER_MEDIUM = {
-  top:    { style: 'medium', color: { rgb: '000000' } },
-  bottom: { style: 'medium', color: { rgb: '000000' } },
-  left:   { style: 'medium', color: { rgb: '000000' } },
-  right:  { style: 'medium', color: { rgb: '000000' } }
-};
-const BORDER_ENTRY = {
-  top:    { style: 'thin', color: { rgb: 'AAAAAA' } },
-  bottom: { style: 'thin', color: { rgb: 'AAAAAA' } },
-  left:   { style: 'thin', color: { rgb: 'AAAAAA' } },
-  right:  { style: 'thin', color: { rgb: 'AAAAAA' } }
-};
-
-
 
 function sgBuildSheet(numbers, sheetTitle) {
-  // ONE row per entry at 35pt height
-  // Row 0: Title merged A:E
-  // Row 1: Headers (gray fill, bold, thin border)
-  // Row 2+: Each entry = 1 row — SL in col A (center), phone in col B (left)
-
   const rows = [];
   rows.push([sheetTitle, '', '', '', '']);
   rows.push(['SL', 'Phone', 'Course', 'DETAILS', '']);
@@ -1076,15 +1067,12 @@ function sgBuildSheet(numbers, sheetTitle) {
     { wch: 6 },
   ];
 
-  // Row heights: title=22, header=20, every data row=35
   const rowH = [{ hpt: 22 }, { hpt: 20 }];
   numbers.forEach(() => rowH.push({ hpt: 35 }));
   ws['!rows'] = rowH;
 
-  // Merge title A1:E1
   ws['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 4 } }];
 
-  // Title
   const titleRef = XLSX.utils.encode_cell({ r: 0, c: 0 });
   if (!ws[titleRef]) ws[titleRef] = { t: 's', v: sheetTitle };
   ws[titleRef].s = {
@@ -1092,7 +1080,6 @@ function sgBuildSheet(numbers, sheetTitle) {
     alignment: { horizontal: 'center', vertical: 'center' }
   };
 
-  // Header row — gray fill, bold, thin black border all sides
   ['SL', 'Phone', 'Course', 'DETAILS', ''].forEach((label, c) => {
     const ref = XLSX.utils.encode_cell({ r: 1, c });
     if (!ws[ref]) ws[ref] = { t: 's', v: label };
@@ -1100,16 +1087,10 @@ function sgBuildSheet(numbers, sheetTitle) {
       font: { bold: true, sz: 11, name: 'Calibri' },
       alignment: { horizontal: c === 0 ? 'center' : 'left', vertical: 'center' },
       fill: { fgColor: { rgb: 'C0C0C0' }, patternType: 'solid' },
-      border: {
-        top:    { style: 'thin', color: { rgb: '000000' } },
-        bottom: { style: 'thin', color: { rgb: '000000' } },
-        left:   { style: 'thin', color: { rgb: '000000' } },
-        right:  { style: 'thin', color: { rgb: '000000' } }
-      }
+      border: BORDER_ALL_THIN
     };
   });
 
-  // Data rows — one per entry, 35pt
   numbers.forEach((ph, i) => {
     const r = 2 + i;
     for (let c = 0; c < 5; c++) {
@@ -1117,19 +1098,14 @@ function sgBuildSheet(numbers, sheetTitle) {
       if (c === 0) {
         ws[ref] = { t: 'n', v: i + 1 };
       } else if (c === 1) {
-        ws[ref] = { t: 's', v: ph }; // text type preserves + prefix
+        ws[ref] = { t: 's', v: ph };
       } else {
         if (!ws[ref]) ws[ref] = { t: 's', v: '' };
       }
       ws[ref].s = {
         font: { bold: c === 0, sz: 11, name: 'Calibri' },
         alignment: { horizontal: c === 0 ? 'center' : 'left', vertical: 'center' },
-        border: {
-          top:    { style: 'thin', color: { rgb: '000000' } },
-          bottom: { style: 'thin', color: { rgb: '000000' } },
-          left:   { style: 'thin', color: { rgb: '000000' } },
-          right:  { style: 'thin', color: { rgb: '000000' } }
-        }
+        border: BORDER_ALL_THIN
       };
     }
   });
@@ -1139,8 +1115,27 @@ function sgBuildSheet(numbers, sheetTitle) {
 
 function sgGenerate() {
   const lines = document.getElementById('sg-input').value.split('\n').filter(l => l.trim());
-  const valid = [], errors = [];
-  lines.forEach(l => { const r = sgParsePhone(l); if (!r) return; r.error ? errors.push(r.raw) : valid.push(r.formatted); });
+  const rawValid = [], errors = [];
+
+  // Step 1: parse and separate valid from invalid
+  lines.forEach(l => {
+    const r = sgParsePhone(l);
+    if (!r) return;
+    r.error ? errors.push(r.raw) : rawValid.push(r.formatted);
+  });
+
+  // Step 2: deduplicate — keep first occurrence, track removed dupes
+  const seen = new Set();
+  const valid = [];
+  const dupes = [];
+  rawValid.forEach(ph => {
+    if (seen.has(ph)) {
+      dupes.push(ph);
+    } else {
+      seen.add(ph);
+      valid.push(ph);
+    }
+  });
 
   const numSheets = Math.min(sgGetSheetCount(), valid.length || 1);
   const perSheet = Math.ceil(valid.length / numSheets);
@@ -1150,15 +1145,23 @@ function sgGenerate() {
   document.getElementById('sg-s-total').textContent = lines.length;
   document.getElementById('sg-s-valid').textContent = valid.length;
   document.getElementById('sg-s-skip').textContent = errors.length;
+  document.getElementById('sg-s-dupes').textContent = dupes.length;
   document.getElementById('sg-s-sheets').textContent = numSheets;
   document.getElementById('sg-s-per').textContent = perSheet;
 
-  // Errors
+  // Errors panel
   const errPanel = document.getElementById('sg-errors');
   const errList = document.getElementById('sg-errors-list');
   errList.innerHTML = '';
   errors.forEach(e => { const li = document.createElement('li'); li.textContent = e; errList.appendChild(li); });
   errPanel.classList.toggle('visible', errors.length > 0);
+
+  // Dupes panel
+  const dupPanel = document.getElementById('sg-dupes-panel');
+  const dupList = document.getElementById('sg-dupes-list');
+  dupList.innerHTML = '';
+  dupes.forEach(d => { const li = document.createElement('li'); li.textContent = d; dupList.appendChild(li); });
+  dupPanel.classList.toggle('visible', dupes.length > 0);
 
   if (!valid.length) {
     document.getElementById('sg-preview').style.display = 'none';
@@ -1169,7 +1172,6 @@ function sgGenerate() {
   const tabBase = document.getElementById('sg-tab').value.trim() || 'Ajisha - WhatsApp';
   const TITLE = 'YOU TUBE DATA AJISHA';
 
-  // Split into equal chunks
   const chunks = [];
   for (let i = 0; i < numSheets; i++) {
     const chunk = valid.slice(i * perSheet, (i + 1) * perSheet);
@@ -1187,12 +1189,10 @@ function sgGenerate() {
 
   XLSX.writeFile(wb, `${tabBase.replace(/[^a-z0-9_\-]/gi, '_')}.xlsx`, { cellStyles: true });
 
-  // Sheet cards
   document.getElementById('sg-sheet-cards').innerHTML = sheetMeta.map(s =>
     `<div class="sg-sheet-card">📄 ${s.name} — <b>${s.count}</b> numbers</div>`
   ).join('');
 
-  // Preview table (first sheet, first 8)
   const show = chunks[0].slice(0, 8);
   let html = `<tr class="r-title"><td colspan="5">${TITLE}</td></tr>`;
   html += `<tr class="r-header"><th>SL</th><th>Phone</th><th>Course</th><th>DETAILS</th><th></th></tr>`;
@@ -1209,6 +1209,7 @@ function sgClear() {
   document.getElementById('sg-custom-n').value = '';
   document.getElementById('sg-stats').style.display = 'none';
   document.getElementById('sg-errors').classList.remove('visible');
+  document.getElementById('sg-dupes-panel').classList.remove('visible');
   document.getElementById('sg-preview').style.display = 'none';
   document.getElementById('sg-hint').innerHTML = '— paste numbers above to see the split';
   document.querySelectorAll('.sg-chip').forEach(c => c.classList.remove('active'));
