@@ -1,1221 +1,276 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dev Toolkit</title>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg: #0d0d0d; --surface: #161616; --surface2: #1e1e1e;
-      --border: #2a2a2a; --accent: #00ff88; --accent2: #ff6b35;
-      --text: #f0f0f0; --muted: #666; --success: #00e676; --error: #ff1744;
-    }
-    body { background: var(--bg); color: var(--text); font-family: 'Space Mono', monospace; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 32px 16px 60px; }
-
-    header { width: 100%; max-width: 1000px; margin-bottom: 28px; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
-    .top-badge { display: inline-block; background: var(--accent); color: #000; font-size: 9px; font-weight: 700; letter-spacing: 2px; padding: 3px 10px; margin-bottom: 10px; }
-    h1 { font-family: 'Syne', sans-serif; font-size: clamp(22px, 4vw, 38px); font-weight: 800; letter-spacing: -1px; }
-    h1 span { color: var(--accent); }
-    .subtitle { margin-top: 6px; color: var(--muted); font-size: 11px; letter-spacing: 1px; }
-
-    .nav-wrap { width: 100%; max-width: 1000px; margin-bottom: 24px; }
-    .nav-group-label { font-size: 9px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
-    .nav-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
-    .nav-btn { background: var(--surface); border: 1px solid var(--border); color: var(--muted); font-family: 'Space Mono', monospace; font-size: 10px; padding: 6px 14px; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
-    .nav-btn:hover { border-color: var(--accent); color: var(--text); }
-    .nav-btn.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 700; }
-
-    .tool-panel { display: none; width: 100%; max-width: 1000px; }
-    .tool-panel.active { display: block; }
-    .tool-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 4px; }
-    .tool-desc { color: var(--muted); font-size: 11px; margin-bottom: 20px; }
-
-    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    @media (max-width: 640px) { .row { grid-template-columns: 1fr; } }
-    .panel { background: var(--surface); border: 1px solid var(--border); padding: 18px; }
-    .panel-label { font-size: 9px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-    .panel-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-    textarea { width: 100%; background: #0d0d0d; border: 1px solid var(--border); color: var(--text); font-family: 'Space Mono', monospace; font-size: 12px; line-height: 1.7; padding: 12px; resize: vertical; min-height: 200px; outline: none; transition: border-color 0.2s; }
-    textarea:focus { border-color: var(--accent); }
-    textarea::placeholder { color: var(--muted); }
-    .output-box { width: 100%; background: #0d0d0d; border: 1px solid var(--border); min-height: 200px; padding: 12px; font-family: 'Space Mono', monospace; font-size: 12px; line-height: 1.7; color: var(--accent); word-break: break-all; white-space: pre-wrap; user-select: all; }
-    .ph { color: var(--muted); }
-    .controls-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 14px; }
-    .btn { padding: 10px 22px; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 1px; cursor: pointer; border: none; transition: all 0.15s; }
-    .btn-primary { background: var(--accent); color: #000; }
-    .btn-primary:hover { background: #00cc6a; }
-    .btn-sec { background: transparent; color: var(--muted); border: 1px solid var(--border); }
-    .btn-sec:hover { border-color: var(--accent2); color: var(--accent2); }
-    .copy-btn { background: transparent; border: 1px solid var(--accent); color: var(--accent); font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 1px; padding: 5px 14px; cursor: pointer; transition: all 0.15s; }
-    .copy-btn:hover { background: var(--accent); color: #000; }
-    .copy-btn.copied { background: var(--success); border-color: var(--success); color: #000; }
-    input[type="text"], input[type="number"], input[type="date"], select { background: #0d0d0d; border: 1px solid var(--border); color: var(--text); font-family: 'Space Mono', monospace; font-size: 12px; padding: 8px 12px; outline: none; }
-    input[type="text"]:focus, input[type="number"]:focus, input[type="date"]:focus, select:focus { border-color: var(--accent); }
-    input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--accent); }
-    select option { background: #0d0d0d; }
-    .sep-btn { background: transparent; border: 1px solid var(--border); color: var(--text); font-family: 'Space Mono', monospace; font-size: 10px; padding: 5px 10px; cursor: pointer; transition: all 0.15s; }
-    .sep-btn:hover, .sep-btn.active { background: var(--accent); color: #000; border-color: var(--accent); }
-    .errors-panel { margin-top: 12px; padding: 12px; background: #1a0a0a; border: 1px solid #3a1010; font-size: 11px; color: #ff6b6b; display: none; }
-    .errors-panel.visible { display: block; }
-    .errors-panel ul { list-style: none; margin-top: 4px; }
-    .errors-panel li::before { content: '⚠ '; }
-    .stat-row { display: flex; gap: 20px; flex-wrap: wrap; padding: 12px 14px; background: var(--surface); border: 1px solid var(--border); font-size: 11px; color: var(--muted); margin-top: 14px; align-items: center; }
-    .stat-val { color: var(--accent); font-weight: 700; }
-    .stat-err { color: var(--error); }
-    .stat-warn { color: #f59e0b; }
-    .field-row { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
-    .field-label { font-size: 11px; color: var(--muted); min-width: 120px; }
-    .result-card { background: var(--surface); border: 1px solid var(--border); padding: 16px 20px; margin-top: 14px; }
-    .result-row { display: flex; justify-content: space-between; font-size: 12px; padding: 6px 0; border-bottom: 1px solid var(--border); }
-    .result-row:last-child { border-bottom: none; }
-    .result-key { color: var(--muted); }
-    .result-val { color: var(--accent); font-weight: 700; }
-    .color-preview { width: 100%; height: 80px; border: 1px solid var(--border); margin-bottom: 14px; transition: background 0.2s; }
-    .chip { display: inline-block; background: var(--surface2); border: 1px solid var(--border); font-size: 10px; padding: 3px 10px; margin: 3px; cursor: pointer; }
-    .chip:hover { border-color: var(--accent); color: var(--accent); }
-    footer { margin-top: 48px; font-size: 10px; color: var(--muted); letter-spacing: 1px; }
-
-    /* ── SHEET GENERATOR STYLES ── */
-    .sg-step { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 16px; }
-    .sg-step-num { min-width: 26px; height: 26px; background: var(--accent); color: #000; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
-    .sg-step-body { flex: 1; }
-    .sg-chips { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-    .sg-chip { padding: 7px 18px; font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; cursor: pointer; border: 1px solid var(--border); background: var(--surface); color: var(--muted); transition: all 0.15s; user-select: none; }
-    .sg-chip:hover { border-color: var(--accent); color: var(--accent); }
-    .sg-chip.active { background: var(--accent); color: #000; border-color: var(--accent); }
-    .sg-custom { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--muted); }
-    .sg-hint { font-size: 11px; color: var(--muted); margin-top: 8px; }
-    .sg-hint span { color: var(--accent); font-weight: 700; }
-    .sg-sheet-cards { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
-    .sg-sheet-card { padding: 6px 14px; border: 1px solid var(--border); font-size: 11px; background: var(--surface2); color: var(--muted); }
-    .sg-sheet-card b { color: var(--accent); }
-    .sg-preview-tbl { width: 100%; border-collapse: collapse; font-size: 11px; font-family: 'Space Mono', monospace; }
-    .sg-preview-tbl td, .sg-preview-tbl th { padding: 4px 8px; border: 1px solid var(--border); color: var(--text); }
-    .sg-preview-tbl .r-title td { text-align: center; font-weight: 700; background: var(--surface2); color: var(--accent); font-size: 12px; }
-    .sg-preview-tbl .r-header th { background: var(--accent); color: #000; font-size: 10px; letter-spacing: 1px; text-align: left; }
-    .sg-preview-tbl .r-sl td { color: var(--muted); font-size: 10px; }
-    .sg-divider { height: 1px; background: var(--border); margin: 18px 0; }
-    .dupes-panel { margin-top: 12px; padding: 12px; background: #1a1200; border: 1px solid #3a2800; font-size: 11px; color: #f59e0b; display: none; }
-    .dupes-panel.visible { display: block; }
-    .dupes-panel ul { list-style: none; margin-top: 4px; }
-    .dupes-panel li::before { content: '⊘ '; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LBS Kerala & Plus Two Calculators</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f3f4f6;
+            --card-bg: #ffffff;
+            --text: #1f2937;
+            --border: #e5e7eb;
+            --success: #10b981;
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        .card {
+            background-color: var(--card-bg);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            margin-top: 0;
+            color: #111827;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+        .btn-success {
+            background-color: var(--success);
+        }
+        .btn-success:hover {
+            background-color: #059669;
+        }
+        .results-box {
+            margin-top: 20px;
+            padding: 16px;
+            background-color: #f8fafc;
+            border-left: 4px solid var(--primary);
+            border-radius: 4px;
+            display: none;
+        }
+        .result-item {
+            margin: 8px 0;
+            font-size: 16px;
+        }
+        .result-highlight {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 18px;
+        }
+        .note {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+    </style>
 </head>
 <body>
 
-<header>
-  <div class="top-badge">DEV TOOLKIT</div>
-  <h1>The <span>Utility</span> Kit</h1>
-  <p class="subtitle">// 18 tools · no data leaves your browser · github pages deployable</p>
-</header>
-
-<div class="nav-wrap">
-  <div class="nav-group-label">Phone & Data</div>
-  <div class="nav-row">
-    <button class="nav-btn active" onclick="switchTool('phone',this)">Phone Formatter</button>
-    <button class="nav-btn" onclick="switchTool('csv',this)">CSV ↔ JSON</button>
-    <button class="nav-btn" onclick="switchTool('json',this)">JSON Formatter</button>
-    <button class="nav-btn" onclick="switchTool('timestamp',this)">Timestamp / TZ</button>
-  </div>
-  <div class="nav-group-label">Text</div>
-  <div class="nav-row">
-    <button class="nav-btn" onclick="switchTool('case',this)">Case Converter</button>
-    <button class="nav-btn" onclick="switchTool('regex',this)">Regex Tester</button>
-    <button class="nav-btn" onclick="switchTool('wordcount',this)">Word Counter</button>
-  </div>
-  <div class="nav-group-label">Generators</div>
-  <div class="nav-row">
-    <button class="nav-btn" onclick="switchTool('qr',this)">QR Code</button>
-    <button class="nav-btn" onclick="switchTool('password',this)">Password</button>
-    <button class="nav-btn" onclick="switchTool('lorem',this)">Lorem Ipsum</button>
-    <button class="nav-btn" onclick="switchTool('uuid',this)">UUID / ID</button>
-    <button class="nav-btn" onclick="switchTool('color',this)">Color Converter</button>
-  </div>
-  <div class="nav-group-label">Calculators</div>
-  <div class="nav-row">
-    <button class="nav-btn" onclick="switchTool('emi',this)">EMI / Loan</button>
-    <button class="nav-btn" onclick="switchTool('gst',this)">GST</button>
-    <button class="nav-btn" onclick="switchTool('discount',this)">Discount / Markup</button>
-    <button class="nav-btn" onclick="switchTool('date',this)">Date Difference</button>
-    <button class="nav-btn" onclick="switchTool('unit',this)">Unit Converter</button>
-  </div>
-  <div class="nav-group-label">Sheet Tools</div>
-  <div class="nav-row">
-    <button class="nav-btn" onclick="switchTool('sheetgen',this)">📊 Sheet Generator</button>
-  </div>
-</div>
-
-<!-- PHONE -->
-<div class="tool-panel active" id="tool-phone">
-  <div class="tool-title">Phone Number Formatter</div>
-  <div class="tool-desc">// paste messy numbers → clean E.164 format with country codes</div>
-  <div class="row">
-    <div class="panel">
-      <div class="panel-label">INPUT — raw numbers</div>
-      <textarea id="ph-input" placeholder="+91 95267 27017&#10;+91 85908 53221&#10;+971 54 377 3039&#10;...one per line"></textarea>
-    </div>
-    <div class="panel">
-      <div class="panel-label">OUTPUT — formatted</div>
-      <div class="output-box" id="ph-output"><span class="ph">// formatted numbers appear here</span></div>
-    </div>
-  </div>
-  <div class="controls-row">
-    <span style="font-size:11px;color:var(--muted)">SEP:</span>
-    <button class="sep-btn active" data-sep="," onclick="phSetSep(this)">comma</button>
-    <button class="sep-btn" data-sep="\n" onclick="phSetSep(this)">newline</button>
-    <button class="sep-btn" data-sep=" " onclick="phSetSep(this)">space</button>
-    <button class="sep-btn" data-sep="|" onclick="phSetSep(this)">pipe</button>
-    <input id="ph-custom-sep" type="text" style="width:60px" placeholder="; " oninput="phCustomSep(this)">
-    <button class="btn btn-primary" onclick="phFormat()">FORMAT →</button>
-    <button class="btn btn-sec" onclick="phClear()">CLEAR</button>
-  </div>
-  <div class="stat-row">
-    <span>TOTAL <span class="stat-val" id="ph-total">0</span></span>
-    <span>VALID <span class="stat-val" id="ph-valid">0</span></span>
-    <span class="stat-err">SKIPPED <span class="stat-val stat-err" id="ph-skipped">0</span></span>
-    <button class="copy-btn" id="ph-copy" onclick="genericCopy('ph-output','ph-copy')" style="margin-left:auto">COPY ALL</button>
-  </div>
-  <div class="errors-panel" id="ph-errors"><strong>SKIPPED:</strong><ul id="ph-errors-list"></ul></div>
-</div>
-
-<!-- CSV JSON -->
-<div class="tool-panel" id="tool-csv">
-  <div class="tool-title">CSV ↔ JSON Converter</div>
-  <div class="tool-desc">// paste CSV to get JSON array, or paste JSON array to get CSV</div>
-  <div class="row">
-    <div class="panel">
-      <div class="panel-label">INPUT</div>
-      <textarea id="csv-input" placeholder="name,age,city&#10;Alice,30,Mumbai&#10;Bob,25,Delhi&#10;&#10;— or paste JSON array —"></textarea>
-    </div>
-    <div class="panel">
-      <div class="panel-label">OUTPUT</div>
-      <div class="output-box" id="csv-output"><span class="ph">// result appears here</span></div>
-    </div>
-  </div>
-  <div class="controls-row">
-    <button class="btn btn-primary" onclick="csvToJson()">CSV → JSON</button>
-    <button class="btn btn-primary" style="background:#3b82f6" onclick="jsonToCsv()">JSON → CSV</button>
-    <button class="btn btn-sec" onclick="document.getElementById('csv-input').value='';document.getElementById('csv-output').innerHTML='<span class=ph>// result appears here</span>'">CLEAR</button>
-    <button class="copy-btn" id="csv-copy" onclick="genericCopy('csv-output','csv-copy')" style="margin-left:auto">COPY</button>
-  </div>
-</div>
-
-<!-- JSON FORMATTER -->
-<div class="tool-panel" id="tool-json">
-  <div class="tool-title">JSON Formatter & Validator</div>
-  <div class="tool-desc">// prettify, minify and validate JSON</div>
-  <div class="row">
-    <div class="panel">
-      <div class="panel-label">INPUT</div>
-      <textarea id="json-input" placeholder='{"name":"Alice","age":30}'></textarea>
-    </div>
-    <div class="panel">
-      <div class="panel-label">OUTPUT</div>
-      <div class="output-box" id="json-output"><span class="ph">// result appears here</span></div>
-    </div>
-  </div>
-  <div class="controls-row">
-    <button class="btn btn-primary" onclick="jsonOp('pretty')">PRETTIFY</button>
-    <button class="btn btn-primary" style="background:#3b82f6" onclick="jsonOp('mini')">MINIFY</button>
-    <button class="btn btn-primary" style="background:#a78bfa" onclick="jsonOp('validate')">VALIDATE</button>
-    <button class="btn btn-sec" onclick="document.getElementById('json-input').value='';document.getElementById('json-output').innerHTML='<span class=ph>// result</span>'">CLEAR</button>
-    <button class="copy-btn" id="json-copy" onclick="genericCopy('json-output','json-copy')" style="margin-left:auto">COPY</button>
-  </div>
-</div>
-
-<!-- TIMESTAMP -->
-<div class="tool-panel" id="tool-timestamp">
-  <div class="tool-title">Timestamp & Timezone Converter</div>
-  <div class="tool-desc">// convert Unix timestamps, ISO dates and see world timezones</div>
-  <div class="panel" style="margin-bottom:14px">
-    <div class="panel-label">UNIX → HUMAN</div>
-    <div class="field-row">
-      <span class="field-label">Unix (seconds)</span>
-      <input type="number" id="ts-unix" placeholder="1700000000" style="width:200px" oninput="tsFromUnix()">
-    </div>
-    <div class="result-card" id="ts-r1" style="display:none"></div>
-  </div>
-  <div class="panel" style="margin-bottom:14px">
-    <div class="panel-label">DATE STRING → UNIX</div>
-    <div class="field-row">
-      <span class="field-label">Date / ISO string</span>
-      <input type="text" id="ts-date" placeholder="2024-01-15 14:30:00" style="width:260px" oninput="tsFromDate()">
-    </div>
-    <div class="result-card" id="ts-r2" style="display:none"></div>
-  </div>
-  <div class="panel">
-    <div class="panel-label">WORLD CLOCKS</div>
-    <div id="ts-zones"></div>
-    <button class="btn btn-primary" style="margin-top:12px" onclick="tsRefresh()">REFRESH</button>
-  </div>
-</div>
-
-<!-- CASE -->
-<div class="tool-panel" id="tool-case">
-  <div class="tool-title">Case Converter</div>
-  <div class="tool-desc">// transform text between naming conventions — click any result to copy</div>
-  <div class="panel" style="margin-bottom:14px">
-    <div class="panel-label">INPUT TEXT</div>
-    <textarea id="case-input" style="min-height:80px" placeholder="hello world example text" oninput="caseConvert()"></textarea>
-  </div>
-  <div id="case-results" style="display:grid;grid-template-columns:1fr 1fr;gap:12px"></div>
-</div>
-
-<!-- REGEX -->
-<div class="tool-panel" id="tool-regex">
-  <div class="tool-title">Regex Tester</div>
-  <div class="tool-desc">// write a pattern, paste text, see matches live</div>
-  <div class="panel" style="margin-bottom:14px">
-    <div class="panel-label">PATTERN</div>
-    <div class="field-row">
-      <input type="text" id="rx-pattern" placeholder="(\d{10})" style="flex:1" oninput="rxTest()">
-      <select id="rx-flags" onchange="rxTest()" style="width:120px">
-        <option value="g">g — global</option>
-        <option value="gi">gi — case insensitive</option>
-        <option value="gm">gm — multiline</option>
-        <option value="gim">gim — all</option>
-      </select>
-    </div>
-  </div>
-  <div class="row">
-    <div class="panel">
-      <div class="panel-label">TEST TEXT</div>
-      <textarea id="rx-input" placeholder="Paste your test text here..." oninput="rxTest()"></textarea>
-    </div>
-    <div class="panel">
-      <div class="panel-label">MATCHES</div>
-      <div class="output-box" id="rx-output" style="color:var(--text)"><span class="ph">// matches here</span></div>
-    </div>
-  </div>
-  <div class="stat-row"><span>MATCHES <span class="stat-val" id="rx-count">0</span></span></div>
-</div>
-
-<!-- WORD COUNT -->
-<div class="tool-panel" id="tool-wordcount">
-  <div class="tool-title">Word & Character Counter</div>
-  <div class="tool-desc">// words, chars, sentences, reading time — live</div>
-  <div class="panel" style="margin-bottom:14px">
-    <div class="panel-label">INPUT TEXT</div>
-    <textarea id="wc-input" style="min-height:160px" placeholder="Paste or type your text here..." oninput="wcCount()"></textarea>
-  </div>
-  <div id="wc-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px"></div>
-</div>
-
-<!-- QR -->
-<div class="tool-panel" id="tool-qr">
-  <div class="tool-title">QR Code Generator</div>
-  <div class="tool-desc">// scannable QR codes for URLs, text, phone numbers</div>
-  <div class="panel" style="margin-bottom:14px">
-    <div class="panel-label">INPUT</div>
-    <input type="text" id="qr-input" placeholder="https://example.com or any text" style="width:100%;margin-bottom:12px" oninput="qrDebounce()">
-    <div class="field-row">
-      <span class="field-label">Size</span>
-      <select id="qr-size">
-        <option value="200">200×200</option>
-        <option value="300" selected>300×300</option>
-        <option value="400">400×400</option>
-      </select>
-      <button class="btn btn-primary" onclick="qrGen()">GENERATE</button>
-    </div>
-  </div>
-  <div class="panel" style="text-align:center;min-height:200px;display:flex;align-items:center;justify-content:center">
-    <div id="qr-output" style="color:var(--muted);font-size:12px">// QR code appears here</div>
-  </div>
-</div>
-
-<!-- PASSWORD -->
-<div class="tool-panel" id="tool-password">
-  <div class="tool-title">Password Generator</div>
-  <div class="tool-desc">// cryptographically random, configurable passwords</div>
-  <div class="panel" style="margin-bottom:14px">
-    <div class="field-row"><span class="field-label">Length</span><input type="number" id="pw-len" value="20" min="4" max="128" style="width:80px"></div>
-    <div class="field-row"><span class="field-label">Uppercase (A–Z)</span><input type="checkbox" id="pw-upper" checked></div>
-    <div class="field-row"><span class="field-label">Lowercase (a–z)</span><input type="checkbox" id="pw-lower" checked></div>
-    <div class="field-row"><span class="field-label">Numbers (0–9)</span><input type="checkbox" id="pw-num" checked></div>
-    <div class="field-row"><span class="field-label">Symbols</span><input type="checkbox" id="pw-sym" checked></div>
-    <div class="field-row"><span class="field-label">Quantity</span><input type="number" id="pw-qty" value="5" min="1" max="50" style="width:80px"></div>
-    <button class="btn btn-primary" style="margin-top:8px" onclick="pwGen()">GENERATE</button>
-  </div>
-  <div class="panel">
-    <div class="panel-label">PASSWORDS</div>
-    <div class="output-box" id="pw-output" style="min-height:120px"><span class="ph">// passwords appear here</span></div>
-    <div class="controls-row"><button class="copy-btn" id="pw-copy" onclick="genericCopy('pw-output','pw-copy')">COPY ALL</button></div>
-  </div>
-</div>
-
-<!-- LOREM -->
-<div class="tool-panel" id="tool-lorem">
-  <div class="tool-title">Lorem Ipsum Generator</div>
-  <div class="tool-desc">// dummy placeholder text for designs and mockups</div>
-  <div class="panel" style="margin-bottom:14px">
-    <div class="field-row">
-      <span class="field-label">Type</span>
-      <select id="lorem-type">
-        <option value="paragraphs">Paragraphs</option>
-        <option value="sentences">Sentences</option>
-        <option value="words">Words</option>
-      </select>
-      <span class="field-label" style="min-width:50px">Count</span>
-      <input type="number" id="lorem-count" value="3" min="1" max="100" style="width:70px">
-      <button class="btn btn-primary" onclick="loremGen()">GENERATE</button>
-    </div>
-  </div>
-  <div class="panel">
-    <div class="panel-label">OUTPUT</div>
-    <div class="output-box" id="lorem-output" style="min-height:200px;color:var(--text)"><span class="ph">// lorem text here</span></div>
-    <div class="controls-row"><button class="copy-btn" id="lorem-copy" onclick="genericCopy('lorem-output','lorem-copy')">COPY</button></div>
-  </div>
-</div>
-
-<!-- UUID -->
-<div class="tool-panel" id="tool-uuid">
-  <div class="tool-title">UUID & Random ID Generator</div>
-  <div class="tool-desc">// UUID v4, hex IDs, nano IDs — one click copy</div>
-  <div class="panel" style="margin-bottom:14px">
-    <div class="field-row">
-      <span class="field-label">Type</span>
-      <select id="uuid-type">
-        <option value="uuid4">UUID v4</option>
-        <option value="hex8">Hex 8-char</option>
-        <option value="hex16">Hex 16-char</option>
-        <option value="nano">Nano ID (21)</option>
-        <option value="num">Numeric (10)</option>
-      </select>
-      <span class="field-label" style="min-width:50px">Qty</span>
-      <input type="number" id="uuid-qty" value="5" min="1" max="50" style="width:70px">
-      <button class="btn btn-primary" onclick="uuidGen()">GENERATE</button>
-    </div>
-  </div>
-  <div class="panel">
-    <div class="panel-label">OUTPUT</div>
-    <div class="output-box" id="uuid-output" style="min-height:150px"><span class="ph">// IDs appear here</span></div>
-    <div class="controls-row"><button class="copy-btn" id="uuid-copy" onclick="genericCopy('uuid-output','uuid-copy')">COPY ALL</button></div>
-  </div>
-</div>
-
-<!-- COLOR -->
-<div class="tool-panel" id="tool-color">
-  <div class="tool-title">Color Format Converter</div>
-  <div class="tool-desc">// HEX ↔ RGB ↔ HSL ↔ CMYK with live preview</div>
-  <div class="color-preview" id="col-preview"></div>
-  <div class="panel" style="margin-bottom:14px">
-    <div class="field-row"><span class="field-label">HEX</span><input type="text" id="col-hex" value="#3b82f6" style="width:140px" oninput="colFromHex()"></div>
-    <div class="field-row"><span class="field-label">RGB</span>
-      <input type="number" id="col-r" value="59" min="0" max="255" style="width:70px" oninput="colFromRgb()">
-      <input type="number" id="col-g" value="130" min="0" max="255" style="width:70px" oninput="colFromRgb()">
-      <input type="number" id="col-b" value="246" min="0" max="255" style="width:70px" oninput="colFromRgb()">
-    </div>
-    <div class="field-row"><span class="field-label">HSL</span>
-      <input type="number" id="col-h" min="0" max="360" style="width:70px" oninput="colFromHsl()">°
-      <input type="number" id="col-s" min="0" max="100" style="width:70px" oninput="colFromHsl()">%
-      <input type="number" id="col-l" min="0" max="100" style="width:70px" oninput="colFromHsl()">%
-    </div>
-    <div class="field-row"><span class="field-label">CMYK</span><span id="col-cmyk" style="color:var(--accent);font-size:12px">–</span></div>
-  </div>
-  <div>
-    <span style="font-size:10px;color:var(--muted);letter-spacing:1px">QUICK COLORS: </span>
-    <span class="chip" onclick="colSet('#ef4444')">Red</span>
-    <span class="chip" onclick="colSet('#3b82f6')">Blue</span>
-    <span class="chip" onclick="colSet('#22c55e')">Green</span>
-    <span class="chip" onclick="colSet('#f59e0b')">Amber</span>
-    <span class="chip" onclick="colSet('#a78bfa')">Purple</span>
-    <span class="chip" onclick="colSet('#ff6b35')">Orange</span>
-    <span class="chip" onclick="colSet('#00ff88')">Mint</span>
-    <span class="chip" onclick="colSet('#000000')">Black</span>
-    <span class="chip" onclick="colSet('#ffffff')">White</span>
-  </div>
-</div>
-
-<!-- EMI -->
-<div class="tool-panel" id="tool-emi">
-  <div class="tool-title">EMI / Loan Calculator</div>
-  <div class="tool-desc">// monthly payment, total interest, full breakdown</div>
-  <div class="panel" style="margin-bottom:14px">
-    <div class="field-row"><span class="field-label">Principal (₹)</span><input type="number" id="emi-p" value="500000" style="width:180px"></div>
-    <div class="field-row"><span class="field-label">Rate (% p.a.)</span><input type="number" id="emi-r" value="8.5" step="0.1" style="width:120px"></div>
-    <div class="field-row"><span class="field-label">Tenure (months)</span><input type="number" id="emi-t" value="60" style="width:100px"></div>
-    <button class="btn btn-primary" style="margin-top:8px" onclick="emiCalc()">CALCULATE</button>
-  </div>
-  <div class="result-card" id="emi-result" style="display:none"></div>
-</div>
-
-<!-- GST -->
-<div class="tool-panel" id="tool-gst">
-  <div class="tool-title">GST Calculator</div>
-  <div class="tool-desc">// add or remove GST at Indian tax rates</div>
-  <div class="panel" style="margin-bottom:14px">
-    <div class="field-row"><span class="field-label">Amount (₹)</span><input type="number" id="gst-amt" value="10000" style="width:160px"></div>
-    <div class="field-row"><span class="field-label">GST Rate</span>
-      <select id="gst-rate" onchange="document.getElementById('gst-custom').style.display=this.value==='custom'?'inline-block':'none'">
-        <option value="5">5%</option><option value="12">12%</option>
-        <option value="18" selected>18%</option><option value="28">28%</option>
-        <option value="custom">Custom</option>
-      </select>
-      <input type="number" id="gst-custom" value="18" style="width:80px;display:none">
-    </div>
-    <div class="field-row"><span class="field-label">Mode</span>
-      <button class="sep-btn active" id="gst-add-btn" onclick="gstMode='add';document.getElementById('gst-add-btn').classList.add('active');document.getElementById('gst-rem-btn').classList.remove('active')">Add GST</button>
-      <button class="sep-btn" id="gst-rem-btn" onclick="gstMode='remove';document.getElementById('gst-rem-btn').classList.add('active');document.getElementById('gst-add-btn').classList.remove('active')">Remove GST</button>
-    </div>
-    <button class="btn btn-primary" style="margin-top:8px" onclick="gstCalc()">CALCULATE</button>
-  </div>
-  <div class="result-card" id="gst-result" style="display:none"></div>
-</div>
-
-<!-- DISCOUNT -->
-<div class="tool-panel" id="tool-discount">
-  <div class="tool-title">Discount & Markup Calculator</div>
-  <div class="tool-desc">// sale price, profit margin, markup percentage</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-    <div class="panel">
-      <div class="panel-label">DISCOUNT</div>
-      <div class="field-row"><span class="field-label">Original (₹)</span><input type="number" id="dis-orig" value="1000" style="width:120px"></div>
-      <div class="field-row"><span class="field-label">Discount %</span><input type="number" id="dis-pct" value="20" style="width:100px"></div>
-      <button class="btn btn-primary" style="margin-top:8px" onclick="disCalc()">CALC</button>
-      <div class="result-card" id="dis-result" style="display:none;margin-top:12px"></div>
-    </div>
-    <div class="panel">
-      <div class="panel-label">MARKUP</div>
-      <div class="field-row"><span class="field-label">Cost (₹)</span><input type="number" id="mu-cost" value="500" style="width:120px"></div>
-      <div class="field-row"><span class="field-label">Markup %</span><input type="number" id="mu-pct" value="40" style="width:100px"></div>
-      <button class="btn btn-primary" style="margin-top:8px" onclick="muCalc()">CALC</button>
-      <div class="result-card" id="mu-result" style="display:none;margin-top:12px"></div>
-    </div>
-  </div>
-</div>
-
-<!-- DATE -->
-<div class="tool-panel" id="tool-date">
-  <div class="tool-title">Date Difference Calculator</div>
-  <div class="tool-desc">// days between dates, working days, age calculator</div>
-  <div class="panel" style="margin-bottom:14px">
-    <div class="field-row"><span class="field-label">Start Date</span><input type="date" id="dt-start" style="width:200px"></div>
-    <div class="field-row"><span class="field-label">End Date</span><input type="date" id="dt-end" style="width:200px"></div>
-    <button class="btn btn-primary" style="margin-top:8px" onclick="dtCalc()">CALCULATE</button>
-  </div>
-  <div class="result-card" id="dt-result" style="display:none"></div>
-  <div class="panel" style="margin-top:16px">
-    <div class="panel-label">AGE CALCULATOR</div>
-    <div class="field-row"><span class="field-label">Date of Birth</span><input type="date" id="age-dob" style="width:200px"></div>
-    <button class="btn btn-primary" style="margin-top:8px" onclick="ageCalc()">CALCULATE AGE</button>
-    <div class="result-card" id="age-result" style="display:none;margin-top:12px"></div>
-  </div>
-</div>
-
-<!-- UNIT -->
-<div class="tool-panel" id="tool-unit">
-  <div class="tool-title">Unit Converter</div>
-  <div class="tool-desc">// length, weight, temperature, area, volume</div>
-  <div class="panel" style="margin-bottom:14px">
-    <div class="field-row">
-      <span class="field-label">Category</span>
-      <select id="unit-cat" onchange="unitUpdateUnits()">
-        <option value="length">Length</option>
-        <option value="weight">Weight</option>
-        <option value="temperature">Temperature</option>
-        <option value="area">Area</option>
-        <option value="volume">Volume</option>
-      </select>
-    </div>
-    <div class="field-row">
-      <input type="number" id="unit-val" value="1" style="width:140px" oninput="unitConvert()">
-      <select id="unit-from" onchange="unitConvert()" style="width:160px"></select>
-      <span style="color:var(--muted)">→</span>
-      <select id="unit-to" onchange="unitConvert()" style="width:160px"></select>
-    </div>
-  </div>
-  <div class="result-card" id="unit-result" style="display:none"></div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════ -->
-<!-- SHEET GENERATOR                                        -->
-<!-- ═══════════════════════════════════════════════════════ -->
-<div class="tool-panel" id="tool-sheetgen">
-  <div class="tool-title">📊 Sheet Generator</div>
-  <div class="tool-desc">// paste numbers → choose how many sheets → downloads exact "YOU TUBE DATA AJISHA" layout · duplicates auto-removed</div>
-
-  <div class="sg-step">
-    <div class="sg-step-num">1</div>
-    <div class="sg-step-body">
-      <div class="panel-label">PASTE PHONE NUMBERS — one per line</div>
-      <textarea id="sg-input" style="min-height:180px" placeholder="+919847249411&#10;+917510260683&#10;+919846448313&#10;+919846976560&#10;+919747877978&#10;..."></textarea>
-    </div>
-  </div>
-
-  <div class="sg-step">
-    <div class="sg-step-num">2</div>
-    <div class="sg-step-body">
-      <div class="panel-label">HOW MANY SHEETS?</div>
-      <div class="sg-chips">
-        <div class="sg-chip" data-n="2" onclick="sgSetChip(this)">2</div>
-        <div class="sg-chip" data-n="3" onclick="sgSetChip(this)">3</div>
-        <div class="sg-chip active" data-n="4" onclick="sgSetChip(this)">4</div>
-        <div class="sg-chip" data-n="5" onclick="sgSetChip(this)">5</div>
-        <div class="sg-chip" data-n="6" onclick="sgSetChip(this)">6</div>
-        <div class="sg-chip" data-n="8" onclick="sgSetChip(this)">8</div>
-        <div class="sg-chip" data-n="10" onclick="sgSetChip(this)">10</div>
-        <div class="sg-custom">
-          <span style="font-size:11px;color:var(--muted)">Custom:</span>
-          <input type="number" id="sg-custom-n" min="1" max="100" placeholder="e.g. 7" style="width:80px" oninput="sgClearChips();sgUpdateHint()">
+<div class="container">
+    <div class="card">
+        <h2>🏥 LBS Index Mark Calculator</h2>
+        <p style="font-size: 14px; color: #4b5563;">Calculate your index for Kerala Nursing & Paramedical allotments.</p>
+        
+        <div class="form-group">
+            <label for="maxMarks">Maximum Marks per Subject (Usually 120 or 100)</label>
+            <input type="number" id="maxMarks" value="120" min="1">
         </div>
-      </div>
-      <div class="sg-hint" id="sg-hint">— paste numbers above to see the split</div>
+        <div class="form-group">
+            <label for="phy">Physics Mark</label>
+            <input type="number" id="phy" placeholder="e.g., 115">
+        </div>
+        <div class="form-group">
+            <label for="chem">Chemistry Mark</label>
+            <input type="number" id="chem" placeholder="e.g., 118">
+        </div>
+        <div class="form-group">
+            <label for="bio">Biology Mark</label>
+            <input type="number" id="bio" placeholder="e.g., 120">
+        </div>
+        <div class="form-group">
+            <label for="alt">Maths/Computer Science Mark (Optional)</label>
+            <div class="note">Only needed if you didn't take Biology and are applying for B.Sc. SLP (Rank List 2).</div>
+            <input type="number" id="alt" placeholder="e.g., 110">
+        </div>
+        <div class="form-group">
+            <label for="eng">English Mark</label>
+            <input type="number" id="eng" placeholder="e.g., 110">
+        </div>
+
+        <button onclick="calculateIndex()">Calculate LBS Index</button>
+
+        <div id="lbsResults" class="results-box">
+            <div class="result-item">Rank List 1 (Nursing/Paramedical): <br><span class="result-highlight" id="rank1"></span></div>
+            <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 12px 0;">
+            <div class="result-item">Rank List 2 (e.g., B.Sc SLP): <br><span class="result-highlight" id="rank2"></span></div>
+            <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 12px 0;">
+            <div class="result-item">Rank List 3 (Out of 400): <br><span class="result-highlight" id="rank3"></span></div>
+        </div>
     </div>
-  </div>
 
-  <div class="sg-step">
-    <div class="sg-step-num">3</div>
-    <div class="sg-step-body">
-      <div class="panel-label">SHEET TAB NAME</div>
-      <div class="field-row">
-        <input type="text" id="sg-tab" value="Ajisha - WhatsApp" style="width:230px">
-        <span style="font-size:11px;color:var(--muted)">→ "… 1", "… 2", "… 3" …</span>
-      </div>
+    <div class="card">
+        <h2>🎓 Plus Two Percentage Calculator</h2>
+        <p style="font-size: 14px; color: #4b5563;">Calculate your overall Higher Secondary percentage.</p>
+        
+        <div class="form-group">
+            <label for="totalObtained">Total Marks Obtained (Plus One + Plus Two)</label>
+            <input type="number" id="totalObtained" placeholder="e.g., 1050">
+        </div>
+        <div class="form-group">
+            <label for="totalMax">Total Maximum Marks</label>
+            <div class="note">Kerala State Board is usually 1200 for combined Plus One and Plus Two.</div>
+            <input type="number" id="totalMax" value="1200" min="1">
+        </div>
+        
+        <button class="btn-success" onclick="calculatePercentage()">Calculate Percentage</button>
+
+        <div id="percResults" class="results-box" style="border-left-color: var(--success);">
+            <div class="result-item">Overall Percentage: <br><span class="result-highlight" style="color: var(--success);" id="percOut"></span></div>
+        </div>
     </div>
-  </div>
 
-  <div class="sg-divider"></div>
+    <div class="card">
+        <h2>📊 Single Subject Standardizer</h2>
+        <p style="font-size: 14px; color: #4b5563;">Convert any mark to the LBS standard (out of 100).</p>
+        
+        <div class="form-group">
+            <label for="singleObtained">Mark Obtained</label>
+            <input type="number" id="singleObtained" placeholder="e.g., 55">
+        </div>
+        <div class="form-group">
+            <label for="singleMax">Maximum Marks for this Subject</label>
+            <input type="number" id="singleMax" placeholder="e.g., 60">
+        </div>
+        
+        <button onclick="calculateStandard()">Standardize to 100</button>
 
-  <div class="controls-row">
-    <button class="btn btn-primary" onclick="sgGenerate()" style="font-size:12px;padding:11px 28px">⬇ GENERATE & DOWNLOAD</button>
-    <button class="btn btn-sec" onclick="sgClear()">CLEAR</button>
-  </div>
-
-  <div class="stat-row" id="sg-stats" style="display:none">
-    <span>TOTAL <span class="stat-val" id="sg-s-total">0</span></span>
-    <span>VALID <span class="stat-val" id="sg-s-valid">0</span></span>
-    <span class="stat-err">SKIPPED <span class="stat-val stat-err" id="sg-s-skip">0</span></span>
-    <span class="stat-warn">DUPES REMOVED <span class="stat-val stat-warn" id="sg-s-dupes">0</span></span>
-    <span>SHEETS <span class="stat-val" id="sg-s-sheets">0</span></span>
-    <span>~PER SHEET <span class="stat-val" id="sg-s-per">0</span></span>
-  </div>
-
-  <div class="errors-panel" id="sg-errors"><strong>SKIPPED (invalid):</strong><ul id="sg-errors-list"></ul></div>
-  <div class="dupes-panel" id="sg-dupes-panel"><strong>DUPLICATES REMOVED:</strong><ul id="sg-dupes-list"></ul></div>
-
-  <div id="sg-preview" style="display:none">
-    <div class="sg-divider"></div>
-    <div class="panel-label">SHEETS IN YOUR FILE</div>
-    <div class="sg-sheet-cards" id="sg-sheet-cards"></div>
-    <div class="panel-label" style="margin-top:4px">PREVIEW — SHEET 1 (first 8 entries)</div>
-    <div style="overflow-x:auto">
-      <table class="sg-preview-tbl" id="sg-preview-tbl"></table>
+        <div id="stdResults" class="results-box">
+            <div class="result-item">Standardized Score: <span class="result-highlight" id="stdOut"></span></div>
+        </div>
     </div>
-    <div style="font-size:10px;color:var(--muted);margin-top:8px">↑ preview only · full file has been downloaded</div>
-  </div>
 </div>
-
-<footer>github pages deployable · 18 tools · zero dependencies · no data leaves your browser</footer>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <script>
-// ── NAV ──────────────────────────────────────────────
-function switchTool(id, btn) {
-  document.querySelectorAll('.tool-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tool-' + id).classList.add('active');
-  btn.classList.add('active');
-}
-
-function genericCopy(outId, btnId) {
-  const text = document.getElementById(outId).textContent;
-  if (!text || text.trim().startsWith('//')) return;
-  navigator.clipboard.writeText(text).then(() => {
-    const btn = document.getElementById(btnId), orig = btn.textContent;
-    btn.textContent = '✓ COPIED'; btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
-  });
-}
-
-function buildResultCard(id, rows) {
-  const el = document.getElementById(id);
-  el.style.display = 'block';
-  el.innerHTML = rows.map(([k, v]) =>
-    `<div class="result-row"><span class="result-key">${k}</span><span class="result-val">${v}</span></div>`
-  ).join('');
-}
-
-// ── PHONE ─────────────────────────────────────────────
-let phSep = ',';
-function phSetSep(btn) {
-  document.querySelectorAll('#tool-phone .sep-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  phSep = btn.dataset.sep === '\\n' ? '\n' : btn.dataset.sep;
-  document.getElementById('ph-custom-sep').value = '';
-  phFormat();
-}
-function phCustomSep(el) {
-  if (el.value) { document.querySelectorAll('#tool-phone .sep-btn').forEach(b => b.classList.remove('active')); phSep = el.value; phFormat(); }
-}
-function parsePhoneRaw(raw) {
-  const t = raw.trim(); if (!t) return null;
-  const d = t.replace(/\D/g, '');
-  if (d.length < 7) return { error: true, raw: t };
-  if (t.startsWith('+')) { const a = t.slice(1).replace(/\D/g, ''); return (a.length < 7 || a.length > 15) ? { error: true, raw: t } : { formatted: '+' + a }; }
-  if (d.startsWith('00') && d.length >= 9) return { formatted: '+' + d.slice(2) };
-  if (d.length === 10 && /^[6-9]/.test(d)) return { formatted: '+91' + d };
-  if (d.length === 12 && d.startsWith('91')) return { formatted: '+' + d };
-  if (d.length === 11 && d.startsWith('0')) return { formatted: '+91' + d.slice(1) };
-  return { error: true, raw: t };
-}
-function phFormat() {
-  const lines = document.getElementById('ph-input').value.split('\n').filter(l => l.trim());
-  const results = [], errors = [];
-  lines.forEach(l => { const r = parsePhoneRaw(l); if (!r) return; r.error ? errors.push(r.raw) : results.push(r.formatted); });
-  const out = document.getElementById('ph-output');
-  if (results.length) { out.textContent = results.join(phSep); }
-  else { out.innerHTML = '<span class="ph">// no valid numbers found</span>'; }
-  document.getElementById('ph-total').textContent = lines.length;
-  document.getElementById('ph-valid').textContent = results.length;
-  document.getElementById('ph-skipped').textContent = errors.length;
-  const ep = document.getElementById('ph-errors'), el = document.getElementById('ph-errors-list');
-  el.innerHTML = '';
-  errors.forEach(e => { const li = document.createElement('li'); li.textContent = e; el.appendChild(li); });
-  ep.classList.toggle('visible', errors.length > 0);
-}
-function phClear() {
-  document.getElementById('ph-input').value = '';
-  document.getElementById('ph-output').innerHTML = '<span class="ph">// formatted numbers appear here</span>';
-  ['ph-total', 'ph-valid', 'ph-skipped'].forEach(id => document.getElementById(id).textContent = '0');
-  document.getElementById('ph-errors').classList.remove('visible');
-}
-let phTimer;
-document.getElementById('ph-input').addEventListener('input', () => { clearTimeout(phTimer); phTimer = setTimeout(phFormat, 400); });
-
-// ── CSV ↔ JSON ────────────────────────────────────────
-function csvToJson() {
-  const lines = document.getElementById('csv-input').value.trim().split('\n').filter(l => l.trim());
-  if (lines.length < 2) { document.getElementById('csv-output').textContent = '// need header + at least 1 data row'; return; }
-  const headers = lines[0].split(',').map(h => h.trim());
-  const rows = lines.slice(1).map(l => {
-    const vals = l.split(',').map(v => v.trim());
-    const obj = {};
-    headers.forEach((h, i) => { const v = vals[i] || ''; obj[h] = v !== '' && !isNaN(v) ? Number(v) : v; });
-    return obj;
-  });
-  document.getElementById('csv-output').textContent = JSON.stringify(rows, null, 2);
-}
-function jsonToCsv() {
-  try {
-    const data = JSON.parse(document.getElementById('csv-input').value.trim());
-    if (!Array.isArray(data) || !data.length) throw new Error('Input must be a JSON array');
-    const headers = Object.keys(data[0]);
-    const rows = [headers.join(','), ...data.map(r => headers.map(h => JSON.stringify(r[h] ?? '')).join(','))];
-    document.getElementById('csv-output').textContent = rows.join('\n');
-  } catch (e) { document.getElementById('csv-output').textContent = '// error: ' + e.message; }
-}
-
-// ── JSON FORMATTER ────────────────────────────────────
-function jsonOp(op) {
-  const val = document.getElementById('json-input').value;
-  const out = document.getElementById('json-output');
-  try {
-    const parsed = JSON.parse(val);
-    if (op === 'pretty') out.textContent = JSON.stringify(parsed, null, 2);
-    else if (op === 'mini') out.textContent = JSON.stringify(parsed);
-    else out.textContent = '✓ Valid JSON — ' + typeof parsed;
-  } catch (e) { out.textContent = '✗ Invalid JSON: ' + e.message; }
-}
-
-// ── TIMESTAMP ─────────────────────────────────────────
-function tsFromUnix() {
-  const v = parseInt(document.getElementById('ts-unix').value);
-  if (isNaN(v)) return;
-  const d = new Date(v * 1000);
-  const el = document.getElementById('ts-r1'); el.style.display = 'block';
-  el.innerHTML = [['UTC', d.toUTCString()], ['ISO 8601', d.toISOString()], ['Local', d.toLocaleString()]]
-    .map(([k, v]) => `<div class="result-row"><span class="result-key">${k}</span><span class="result-val" style="font-size:11px">${v}</span></div>`).join('');
-}
-function tsFromDate() {
-  const d = new Date(document.getElementById('ts-date').value);
-  if (isNaN(d.getTime())) return;
-  const el = document.getElementById('ts-r2'); el.style.display = 'block';
-  el.innerHTML = [['Unix (s)', Math.floor(d.getTime() / 1000)], ['Unix (ms)', d.getTime()], ['ISO 8601', d.toISOString()]]
-    .map(([k, v]) => `<div class="result-row"><span class="result-key">${k}</span><span class="result-val">${v}</span></div>`).join('');
-}
-function tsRefresh() {
-  const zones = [['UTC', 'UTC'], ['India (IST)', 'Asia/Kolkata'], ['UAE (GST)', 'Asia/Dubai'], ['London', 'Europe/London'], ['New York', 'America/New_York'], ['Singapore', 'Asia/Singapore'], ['Tokyo', 'Asia/Tokyo']];
-  const now = new Date();
-  document.getElementById('ts-zones').innerHTML = zones.map(([label, tz]) => {
-    const t = now.toLocaleTimeString('en-US', { timeZone: tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-    const d = now.toLocaleDateString('en-IN', { timeZone: tz, day: '2-digit', month: 'short', year: 'numeric' });
-    return `<div class="result-row"><span class="result-key">${label}</span><span class="result-val">${d} · ${t}</span></div>`;
-  }).join('');
-}
-tsRefresh();
-
-// ── CASE CONVERTER ────────────────────────────────────
-const caseFns = [
-  ['camelCase', s => s.trim().toLowerCase().replace(/[^a-z0-9]+(.)/gi, (_, c) => c.toUpperCase())],
-  ['PascalCase', s => s.trim().replace(/[^a-z0-9]+(.)/gi, (_, c) => c.toUpperCase()).replace(/^./, c => c.toUpperCase())],
-  ['snake_case', s => s.trim().toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '')],
-  ['SCREAMING_SNAKE', s => s.trim().toUpperCase().replace(/\s+/g, '_').replace(/[^A-Z0-9_]/g, '')],
-  ['kebab-case', s => s.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')],
-  ['UPPER CASE', s => s.toUpperCase()],
-  ['lower case', s => s.toLowerCase()],
-  ['Title Case', s => s.replace(/\w\S*/g, t => t[0].toUpperCase() + t.slice(1).toLowerCase())],
-  ['Sentence case', s => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase()],
-  ['dot.case', s => s.trim().toLowerCase().replace(/\s+/g, '.').replace(/[^a-z0-9.]/g, '')],
-];
-function caseConvert() {
-  const input = document.getElementById('case-input').value;
-  const container = document.getElementById('case-results');
-  if (!input.trim()) { container.innerHTML = ''; return; }
-  container.innerHTML = caseFns.map(([label, fn]) => {
-    const result = fn(input);
-    const safe = result.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-    return `<div class="panel" style="cursor:pointer" onclick="navigator.clipboard.writeText('${safe}')">
-      <div class="panel-label">${label}</div>
-      <div style="font-size:12px;color:var(--accent);word-break:break-all">${result}</div>
-      <div style="font-size:9px;color:var(--muted);margin-top:6px">click to copy</div>
-    </div>`;
-  }).join('');
-}
-
-// ── REGEX ─────────────────────────────────────────────
-function rxTest() {
-  const pattern = document.getElementById('rx-pattern').value;
-  const flags = document.getElementById('rx-flags').value;
-  const text = document.getElementById('rx-input').value;
-  const out = document.getElementById('rx-output');
-  if (!pattern || !text) { out.innerHTML = '<span class="ph">// matches appear here</span>'; document.getElementById('rx-count').textContent = '0'; return; }
-  try {
-    const rx = new RegExp(pattern, flags);
-    const matches = [...text.matchAll(rx)];
-    document.getElementById('rx-count').textContent = matches.length;
-    if (!matches.length) { out.textContent = '// no matches found'; return; }
-    out.innerHTML = matches.map((m, i) => {
-      const groups = m.slice(1).length ? '\n  ' + m.slice(1).map((g, j) => `$${j + 1}="${g}"`).join(', ') : '';
-      return `<span style="color:var(--muted)">Match ${i + 1} @ pos ${m.index}:</span> <span style="color:var(--accent)">${m[0]}</span>${groups}`;
-    }).join('\n\n');
-  } catch (e) { out.textContent = '// regex error: ' + e.message; }
-}
-
-// ── WORD COUNT ────────────────────────────────────────
-function wcCount() {
-  const t = document.getElementById('wc-input').value;
-  const words = t.trim() ? t.trim().split(/\s+/).length : 0;
-  const cards = [
-    ['WORDS', words],
-    ['CHARACTERS', t.length],
-    ['CHARS (no spaces)', t.replace(/\s/g, '').length],
-    ['SENTENCES', t.split(/[.!?]+/).filter(s => s.trim()).length],
-    ['PARAGRAPHS', t.split(/\n+/).filter(p => p.trim()).length],
-    ['READ TIME', Math.max(1, Math.round(words / 200)) + 'm'],
-  ];
-  document.getElementById('wc-cards').innerHTML = cards.map(([k, v]) =>
-    `<div class="panel" style="text-align:center"><div style="font-size:9px;color:var(--muted);letter-spacing:2px;margin-bottom:6px">${k}</div><div style="font-size:26px;font-weight:700;color:var(--accent);font-family:'Syne',sans-serif">${v}</div></div>`
-  ).join('');
-}
-
-// ── QR CODE ───────────────────────────────────────────
-let qrTimer;
-function qrDebounce() { clearTimeout(qrTimer); qrTimer = setTimeout(qrGen, 600); }
-function qrGen() {
-  const val = document.getElementById('qr-input').value.trim();
-  const size = document.getElementById('qr-size').value;
-  if (!val) return;
-  const url = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(val)}`;
-  document.getElementById('qr-output').innerHTML = `<img src="${url}" style="max-width:100%;border:4px solid #fff"><br><a href="${url}" download="qrcode.png" style="display:inline-block;margin-top:12px;color:var(--accent);font-size:11px;text-decoration:none;border:1px solid var(--accent);padding:6px 16px">DOWNLOAD PNG</a>`;
-}
-
-// ── PASSWORD ──────────────────────────────────────────
-function pwGen() {
-  const len = +document.getElementById('pw-len').value, qty = +document.getElementById('pw-qty').value;
-  let chars = '';
-  if (document.getElementById('pw-upper').checked) chars += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  if (document.getElementById('pw-lower').checked) chars += 'abcdefghijklmnopqrstuvwxyz';
-  if (document.getElementById('pw-num').checked) chars += '0123456789';
-  if (document.getElementById('pw-sym').checked) chars += '!@#$%^&*()-_=+[]{}|;:,.<>?';
-  if (!chars) { document.getElementById('pw-output').textContent = '// select at least one character type'; return; }
-  const passwords = Array.from({ length: qty }, () =>
-    Array.from({ length: len }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
-  );
-  document.getElementById('pw-output').textContent = passwords.join('\n');
-}
-
-// ── LOREM IPSUM ───────────────────────────────────────
-const LW = 'lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua enim ad minim veniam quis nostrud exercitation ullamco laboris nisi aliquip ex ea commodo consequat duis aute irure reprehenderit voluptate velit esse cillum dolore eu fugiat nulla pariatur excepteur sint occaecat cupidatat non proident sunt culpa qui officia deserunt mollit anim id est laborum'.split(' ');
-const rw = () => LW[Math.floor(Math.random() * LW.length)];
-const rs = () => { const n = 8 + Math.floor(Math.random() * 10); return Array.from({ length: n }, (_, i) => { const w = rw(); return i === 0 ? w[0].toUpperCase() + w.slice(1) : w; }).join(' ') + '.'; };
-const rp = () => Array.from({ length: 4 + Math.floor(Math.random() * 4) }, rs).join(' ');
-function loremGen() {
-  const type = document.getElementById('lorem-type').value, count = +document.getElementById('lorem-count').value;
-  const result = type === 'words' ? Array.from({ length: count }, rw).join(' ') : type === 'sentences' ? Array.from({ length: count }, rs).join(' ') : Array.from({ length: count }, rp).join('\n\n');
-  document.getElementById('lorem-output').textContent = result;
-}
-
-// ── UUID ──────────────────────────────────────────────
-const NANO = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
-const genUUID4 = () => 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16); });
-const genHex = n => Array.from({ length: n }, () => Math.floor(Math.random() * 16).toString(16)).join('');
-const genNano = (n = 21) => Array.from({ length: n }, () => NANO[Math.floor(Math.random() * 64)]).join('');
-const genNum = () => Array.from({ length: 10 }, (_, i) => i === 0 ? 1 + Math.floor(Math.random() * 9) : Math.floor(Math.random() * 10)).join('');
-function uuidGen() {
-  const type = document.getElementById('uuid-type').value, qty = +document.getElementById('uuid-qty').value;
-  const fn = { uuid4: genUUID4, hex8: () => genHex(8), hex16: () => genHex(16), nano: genNano, num: genNum }[type];
-  document.getElementById('uuid-output').textContent = Array.from({ length: qty }, fn).join('\n');
-}
-
-// ── COLOR ─────────────────────────────────────────────
-function rgbToHsl(r, g, b) { r /= 255; g /= 255; b /= 255; const max = Math.max(r, g, b), min = Math.min(r, g, b); let h, s, l = (max + min) / 2; if (max === min) { h = s = 0; } else { const d = max - min; s = l > 0.5 ? d / (2 - max - min) : d / (max + min); switch (max) { case r: h = (g - b) / d + (g < b ? 6 : 0); break; case g: h = (b - r) / d + 2; break; default: h = (r - g) / d + 4; } h /= 6; } return [h * 360, s * 100, l * 100]; }
-function hslToRgb(h, s, l) { h /= 360; s /= 100; l /= 100; let r, g, b; if (!s) { r = g = b = l; } else { const q = l < 0.5 ? l * (1 + s) : l + s - l * s, p = 2 * l - q, hue2 = (pp, qq, t) => { if (t < 0) t += 1; if (t > 1) t -= 1; if (t < 1 / 6) return pp + (qq - pp) * 6 * t; if (t < 1 / 2) return qq; if (t < 2 / 3) return pp + (qq - pp) * (2 / 3 - t) * 6; return pp; }; r = hue2(p, q, h + 1 / 3); g = hue2(p, q, h); b = hue2(p, q, h - 1 / 3); } return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)]; }
-function rgbToCmyk(r, g, b) { if (!r && !g && !b) return [0, 0, 0, 100]; r /= 255; g /= 255; b /= 255; const k = 1 - Math.max(r, g, b); return [Math.round((1 - r - k) / (1 - k) * 100), Math.round((1 - g - k) / (1 - k) * 100), Math.round((1 - b - k) / (1 - k) * 100), Math.round(k * 100)]; }
-function colUpdateAll(r, g, b) {
-  const hex = '#' + [r, g, b].map(v => Math.max(0, Math.min(255, v)).toString(16).padStart(2, '0')).join('');
-  const [h, s, l] = rgbToHsl(r, g, b), cmyk = rgbToCmyk(r, g, b);
-  document.getElementById('col-hex').value = hex;
-  document.getElementById('col-r').value = r; document.getElementById('col-g').value = g; document.getElementById('col-b').value = b;
-  document.getElementById('col-h').value = Math.round(h); document.getElementById('col-s').value = Math.round(s); document.getElementById('col-l').value = Math.round(l);
-  document.getElementById('col-cmyk').textContent = `C:${cmyk[0]}% M:${cmyk[1]}% Y:${cmyk[2]}% K:${cmyk[3]}%`;
-  document.getElementById('col-preview').style.background = hex;
-}
-function colFromHex() { const hex = document.getElementById('col-hex').value.replace('#', ''); if (hex.length !== 6) return; const r = parseInt(hex.slice(0, 2), 16), g = parseInt(hex.slice(2, 4), 16), b = parseInt(hex.slice(4, 6), 16); if (!isNaN(r)) colUpdateAll(r, g, b); }
-function colFromRgb() { colUpdateAll(+document.getElementById('col-r').value, +document.getElementById('col-g').value, +document.getElementById('col-b').value); }
-function colFromHsl() { const [r, g, b] = hslToRgb(+document.getElementById('col-h').value, +document.getElementById('col-s').value, +document.getElementById('col-l').value); colUpdateAll(r, g, b); }
-function colSet(hex) { document.getElementById('col-hex').value = hex; colFromHex(); }
-colSet('#3b82f6');
-
-// ── EMI ───────────────────────────────────────────────
-function emiCalc() {
-  const P = +document.getElementById('emi-p').value, r = +document.getElementById('emi-r').value / 1200, n = +document.getElementById('emi-t').value;
-  if (!P || !r || !n) return;
-  const emi = P * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1), total = emi * n, interest = total - P;
-  buildResultCard('emi-result', [
-    ['Monthly EMI', '₹' + emi.toLocaleString('en-IN', { maximumFractionDigits: 2 })],
-    ['Total Payable', '₹' + total.toLocaleString('en-IN', { maximumFractionDigits: 2 })],
-    ['Principal', '₹' + P.toLocaleString('en-IN')],
-    ['Total Interest', '₹' + interest.toLocaleString('en-IN', { maximumFractionDigits: 2 })],
-    ['Tenure', n + ' months (' + Math.round(n / 12 * 10) / 10 + ' yrs)'],
-    ['Interest % of Principal', ((interest / P) * 100).toFixed(1) + '%']
-  ]);
-}
-
-// ── GST ───────────────────────────────────────────────
-let gstMode = 'add';
-function gstCalc() {
-  const rateEl = document.getElementById('gst-rate'), amt = +document.getElementById('gst-amt').value;
-  const rate = rateEl.value === 'custom' ? +document.getElementById('gst-custom').value : +rateEl.value;
-  if (!amt || !rate) return;
-  if (gstMode === 'add') {
-    const gstAmt = amt * rate / 100, total = amt + gstAmt;
-    buildResultCard('gst-result', [['Base Amount (excl. GST)', '₹' + amt.toLocaleString('en-IN')], ['GST @ ' + rate + '%', '₹' + gstAmt.toLocaleString('en-IN', { maximumFractionDigits: 2 })], ['Total (incl. GST)', '₹' + total.toLocaleString('en-IN', { maximumFractionDigits: 2 })]]);
-  } else {
-    const base = amt * 100 / (100 + rate), gstAmt = amt - base;
-    buildResultCard('gst-result', [['Total Amount (given)', '₹' + amt.toLocaleString('en-IN')], ['Base Amount (excl. GST)', '₹' + base.toLocaleString('en-IN', { maximumFractionDigits: 2 })], ['GST @ ' + rate + '%', '₹' + gstAmt.toLocaleString('en-IN', { maximumFractionDigits: 2 })]]);
-  }
-}
-
-// ── DISCOUNT / MARKUP ─────────────────────────────────
-function disCalc() { const orig = +document.getElementById('dis-orig').value, pct = +document.getElementById('dis-pct').value; const save = orig * pct / 100, sale = orig - save; buildResultCard('dis-result', [['Original Price', '₹' + orig.toLocaleString('en-IN')], ['Discount @ ' + pct + '%', '₹' + save.toLocaleString('en-IN', { maximumFractionDigits: 2 })], ['Sale Price', '₹' + sale.toLocaleString('en-IN', { maximumFractionDigits: 2 })]]); }
-function muCalc() { const cost = +document.getElementById('mu-cost').value, pct = +document.getElementById('mu-pct').value; const markup = cost * pct / 100, price = cost + markup, margin = (markup / price * 100).toFixed(1); buildResultCard('mu-result', [['Cost Price', '₹' + cost.toLocaleString('en-IN')], ['Markup @ ' + pct + '%', '₹' + markup.toLocaleString('en-IN', { maximumFractionDigits: 2 })], ['Selling Price', '₹' + price.toLocaleString('en-IN', { maximumFractionDigits: 2 })], ['Profit Margin', margin + '%']]); }
-
-// ── DATE DIFF ─────────────────────────────────────────
-const todayStr = new Date().toISOString().split('T')[0];
-document.getElementById('dt-start').value = todayStr;
-document.getElementById('dt-end').value = todayStr;
-document.getElementById('age-dob').value = '1990-01-01';
-function dtCalc() {
-  const s = new Date(document.getElementById('dt-start').value), e = new Date(document.getElementById('dt-end').value);
-  const diff = Math.abs(e - s), days = Math.floor(diff / 86400000);
-  let working = 0, d = new Date(Math.min(+s, +e));
-  for (let i = 0; i < days; i++) { d.setDate(d.getDate() + 1); if (d.getDay() !== 0 && d.getDay() !== 6) working++; }
-  buildResultCard('dt-result', [['Total Days', days.toLocaleString()], ['Working Days', working.toLocaleString()], ['Weekends', (days - working).toLocaleString()], ['Weeks', Math.floor(days / 7)], ['Approx Months', Math.round(days / 30.44)], ['Approx Years', (days / 365.25).toFixed(2)]]);
-}
-function ageCalc() {
-  const dob = new Date(document.getElementById('age-dob').value), now = new Date();
-  let y = now.getFullYear() - dob.getFullYear(), m = now.getMonth() - dob.getMonth(), d = now.getDate() - dob.getDate();
-  if (d < 0) { m--; d += new Date(now.getFullYear(), now.getMonth(), 0).getDate(); }
-  if (m < 0) { y--; m += 12; }
-  const totalDays = Math.floor((now - dob) / 86400000);
-  const nextBD = new Date(now.getFullYear(), dob.getMonth(), dob.getDate());
-  if (nextBD <= now) nextBD.setFullYear(now.getFullYear() + 1);
-  const daysToNext = Math.ceil((nextBD - now) / 86400000);
-  buildResultCard('age-result', [['Age', y + ' years, ' + m + ' months, ' + d + ' days'], ['Total Days', totalDays.toLocaleString()], ['Total Weeks', Math.floor(totalDays / 7).toLocaleString()], ['Next Birthday', nextBD.toDateString() + ' (in ' + daysToNext + ' days)']]);
-}
-
-// ── UNIT CONVERTER ────────────────────────────────────
-const unitData = {
-  length: { units: ['mm', 'cm', 'm', 'km', 'inch', 'foot', 'yard', 'mile'], base: { mm: 0.001, cm: 0.01, m: 1, km: 1000, inch: 0.0254, foot: 0.3048, yard: 0.9144, mile: 1609.344 } },
-  weight: { units: ['mg', 'g', 'kg', 'tonne', 'oz', 'lb'], base: { mg: 0.000001, g: 0.001, kg: 1, tonne: 1000, oz: 0.0283495, lb: 0.453592 } },
-  temperature: { units: ['°C', '°F', 'K'], base: null },
-  area: { units: ['mm²', 'cm²', 'm²', 'km²', 'acre', 'hectare', 'sqft', 'sqyard'], base: { 'mm²': 0.000001, 'cm²': 0.0001, 'm²': 1, 'km²': 1000000, 'acre': 4046.86, 'hectare': 10000, 'sqft': 0.092903, 'sqyard': 0.836127 } },
-  volume: { units: ['ml', 'l', 'm³', 'tsp', 'tbsp', 'cup', 'fl_oz', 'gallon'], base: { ml: 0.001, l: 1, 'm³': 1000, tsp: 0.00492892, tbsp: 0.0147868, cup: 0.236588, fl_oz: 0.0295735, gallon: 3.78541 } },
-};
-function unitUpdateUnits() {
-  const cat = document.getElementById('unit-cat').value, { units } = unitData[cat];
-  ['unit-from', 'unit-to'].forEach((id, i) => {
-    const sel = document.getElementById(id);
-    sel.innerHTML = units.map((u, j) => `<option value="${u}"${(i === 0 && j === units.length - 2) || (i === 1 && j === units.length - 3) ? ' selected' : ''}>${u}</option>`).join('');
-  });
-  unitConvert();
-}
-function unitConvert() {
-  const cat = document.getElementById('unit-cat').value;
-  const val = +document.getElementById('unit-val').value;
-  const from = document.getElementById('unit-from').value, to = document.getElementById('unit-to').value;
-  let result;
-  if (cat === 'temperature') {
-    let c;
-    if (from === '°C') c = val; else if (from === '°F') c = (val - 32) * 5 / 9; else c = val - 273.15;
-    result = to === '°C' ? c : to === '°F' ? c * 9 / 5 + 32 : c + 273.15;
-  } else {
-    const { base } = unitData[cat];
-    result = val * base[from] / base[to];
-  }
-  document.getElementById('unit-result').style.display = 'block';
-  document.getElementById('unit-result').innerHTML = `<div class="result-row"><span class="result-key" style="font-size:14px">${val} ${from}</span><span class="result-val" style="font-size:20px">${+result.toPrecision(8)} ${to}</span></div>`;
-}
-unitUpdateUnits();
-
-
-// ═══════════════════════════════════════════════════════
-// ── SHEET GENERATOR ─────────────────────────────────────
-// ═══════════════════════════════════════════════════════
-let sgActiveSheets = 4;
-
-function sgSetChip(el) {
-  document.querySelectorAll('.sg-chip').forEach(c => c.classList.remove('active'));
-  el.classList.add('active');
-  sgActiveSheets = parseInt(el.dataset.n);
-  document.getElementById('sg-custom-n').value = '';
-  sgUpdateHint();
-}
-
-function sgClearChips() {
-  document.querySelectorAll('.sg-chip').forEach(c => c.classList.remove('active'));
-  sgActiveSheets = 0;
-}
-
-function sgGetSheetCount() {
-  const cv = document.getElementById('sg-custom-n').value;
-  if (cv && parseInt(cv) > 0) return parseInt(cv);
-  return sgActiveSheets || 4;
-}
-
-function sgParsePhone(raw) {
-  const t = raw.trim(); if (!t) return null;
-  const d = t.replace(/\D/g, '');
-  if (d.length < 7) return { error: true, raw: t };
-  if (t.startsWith('+')) {
-    const a = t.slice(1).replace(/\D/g, '');
-    return (a.length < 7 || a.length > 15) ? { error: true, raw: t } : { formatted: '+' + a };
-  }
-  if (d.startsWith('00') && d.length >= 9) return { formatted: '+' + d.slice(2) };
-  if (d.length === 10 && /^[6-9]/.test(d)) return { formatted: '+91' + d };
-  if (d.length === 12 && d.startsWith('91')) return { formatted: '+' + d };
-  if (d.length === 11 && d.startsWith('0')) return { formatted: '+91' + d.slice(1) };
-  return { error: true, raw: t };
-}
-
-function sgCountValid() {
-  const lines = document.getElementById('sg-input').value.split('\n').filter(l => l.trim());
-  const seen = new Set();
-  let v = 0;
-  lines.forEach(l => {
-    const r = sgParsePhone(l);
-    if (r && !r.error && !seen.has(r.formatted)) { seen.add(r.formatted); v++; }
-  });
-  return v;
-}
-
-function sgUpdateHint() {
-  const v = sgCountValid();
-  const s = sgGetSheetCount();
-  const el = document.getElementById('sg-hint');
-  if (!v) { el.innerHTML = '— paste numbers above to see the split'; return; }
-  const per = Math.ceil(v / s);
-  el.innerHTML = `<span style="color:var(--accent);font-weight:700">${v}</span> unique numbers ÷ <span style="color:var(--accent);font-weight:700">${s}</span> sheets = ~<span style="color:var(--accent);font-weight:700">${per}</span> per sheet`;
-}
-
-document.getElementById('sg-input').addEventListener('input', sgUpdateHint);
-
-// Helper: cell style builder
-function cs(fontBold, fontSize, hAlign, vAlign, fillRgb, borderObj) {
-  const s = {
-    font: { bold: !!fontBold, sz: fontSize || 11, name: 'Calibri' },
-    alignment: { horizontal: hAlign || 'left', vertical: vAlign || 'center', wrapText: false }
-  };
-  if (fillRgb) s.fill = { fgColor: { rgb: fillRgb }, patternType: 'solid' };
-  if (borderObj) s.border = borderObj;
-  return s;
-}
-
-const BORDER_ALL_THIN = {
-  top:    { style: 'thin', color: { rgb: '000000' } },
-  bottom: { style: 'thin', color: { rgb: '000000' } },
-  left:   { style: 'thin', color: { rgb: '000000' } },
-  right:  { style: 'thin', color: { rgb: '000000' } }
-};
-
-function sgBuildSheet(numbers, sheetTitle) {
-  const rows = [];
-  rows.push([sheetTitle, '', '', '', '']);
-  rows.push(['SL', 'Phone', 'Course', 'DETAILS', '']);
-  numbers.forEach((ph, i) => rows.push([i + 1, ph, '', '', '']));
-
-  const ws = XLSX.utils.aoa_to_sheet(rows);
-
-  ws['!cols'] = [
-    { wch: 6 },
-    { wch: 18 },
-    { wch: 12 },
-    { wch: 32 },
-    { wch: 6 },
-  ];
-
-  const rowH = [{ hpt: 22 }, { hpt: 20 }];
-  numbers.forEach(() => rowH.push({ hpt: 35 }));
-  ws['!rows'] = rowH;
-
-  ws['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 4 } }];
-
-  const titleRef = XLSX.utils.encode_cell({ r: 0, c: 0 });
-  if (!ws[titleRef]) ws[titleRef] = { t: 's', v: sheetTitle };
-  ws[titleRef].s = {
-    font: { bold: true, sz: 13, name: 'Calibri' },
-    alignment: { horizontal: 'center', vertical: 'center' }
-  };
-
-  ['SL', 'Phone', 'Course', 'DETAILS', ''].forEach((label, c) => {
-    const ref = XLSX.utils.encode_cell({ r: 1, c });
-    if (!ws[ref]) ws[ref] = { t: 's', v: label };
-    ws[ref].s = {
-      font: { bold: true, sz: 11, name: 'Calibri' },
-      alignment: { horizontal: c === 0 ? 'center' : 'left', vertical: 'center' },
-      fill: { fgColor: { rgb: 'C0C0C0' }, patternType: 'solid' },
-      border: BORDER_ALL_THIN
-    };
-  });
-
-  numbers.forEach((ph, i) => {
-    const r = 2 + i;
-    for (let c = 0; c < 5; c++) {
-      const ref = XLSX.utils.encode_cell({ r, c });
-      if (c === 0) {
-        ws[ref] = { t: 'n', v: i + 1 };
-      } else if (c === 1) {
-        ws[ref] = { t: 's', v: ph };
-      } else {
-        if (!ws[ref]) ws[ref] = { t: 's', v: '' };
-      }
-      ws[ref].s = {
-        font: { bold: c === 0, sz: 11, name: 'Calibri' },
-        alignment: { horizontal: c === 0 ? 'center' : 'left', vertical: 'center' },
-        border: BORDER_ALL_THIN
-      };
+    // Helper function to normalize a score to out of 100
+    function normalize(mark, max) {
+        if (isNaN(mark) || mark === "") return 0;
+        return (parseFloat(mark) / parseFloat(max)) * 100;
     }
-  });
 
-  return ws;
-}
+    // Tool 1 Logic
+    function calculateIndex() {
+        const max = document.getElementById('maxMarks').value;
+        const phy = document.getElementById('phy').value;
+        const chem = document.getElementById('chem').value;
+        const bio = document.getElementById('bio').value;
+        const alt = document.getElementById('alt').value;
+        const eng = document.getElementById('eng').value;
 
-function sgGenerate() {
-  const lines = document.getElementById('sg-input').value.split('\n').filter(l => l.trim());
-  const rawValid = [], errors = [];
+        if (!max || max <= 0) {
+            alert("Please enter a valid maximum mark.");
+            return;
+        }
 
-  // Step 1: parse and separate valid from invalid
-  lines.forEach(l => {
-    const r = sgParsePhone(l);
-    if (!r) return;
-    r.error ? errors.push(r.raw) : rawValid.push(r.formatted);
-  });
+        const normPhy = normalize(phy, max);
+        const normChem = normalize(chem, max);
+        const normBio = normalize(bio, max);
+        const normAlt = normalize(alt, max);
+        const normEng = normalize(eng, max);
 
-  // Step 2: deduplicate — keep first occurrence, track removed dupes
-  const seen = new Set();
-  const valid = [];
-  const dupes = [];
-  rawValid.forEach(ph => {
-    if (seen.has(ph)) {
-      dupes.push(ph);
-    } else {
-      seen.add(ph);
-      valid.push(ph);
+        let rank1 = 0;
+        if (phy && chem && bio) {
+            rank1 = normPhy + normChem + normBio;
+        }
+
+        let rank2 = 0;
+        if (phy && chem) {
+            const thirdSubject = bio ? normBio : normAlt;
+            rank2 = normPhy + normChem + thirdSubject;
+        }
+
+        let rank3 = 0;
+        if (phy && chem && bio && eng) {
+            rank3 = normPhy + normChem + normBio + normEng;
+        }
+
+        document.getElementById('rank1').innerText = rank1 > 0 ? `${rank1.toFixed(2)} / 300` : "Need Physics, Chemistry, and Biology marks.";
+        document.getElementById('rank2').innerText = rank2 > 0 ? `${rank2.toFixed(2)} / 300` : "Need Physics, Chemistry, and (Biology or Alt) marks.";
+        document.getElementById('rank3').innerText = rank3 > 0 ? `${rank3.toFixed(2)} / 400` : "Need Physics, Chemistry, Biology, and English marks.";
+        
+        document.getElementById('lbsResults').style.display = 'block';
     }
-  });
 
-  const numSheets = Math.min(sgGetSheetCount(), valid.length || 1);
-  const perSheet = Math.ceil(valid.length / numSheets);
+    // Tool 2 Logic
+    function calculatePercentage() {
+        const obt = document.getElementById('totalObtained').value;
+        const max = document.getElementById('totalMax').value;
 
-  // Stats
-  document.getElementById('sg-stats').style.display = 'flex';
-  document.getElementById('sg-s-total').textContent = lines.length;
-  document.getElementById('sg-s-valid').textContent = valid.length;
-  document.getElementById('sg-s-skip').textContent = errors.length;
-  document.getElementById('sg-s-dupes').textContent = dupes.length;
-  document.getElementById('sg-s-sheets').textContent = numSheets;
-  document.getElementById('sg-s-per').textContent = perSheet;
+        if (!max || max <= 0 || !obt) {
+            alert("Please enter valid total marks.");
+            return;
+        }
 
-  // Errors panel
-  const errPanel = document.getElementById('sg-errors');
-  const errList = document.getElementById('sg-errors-list');
-  errList.innerHTML = '';
-  errors.forEach(e => { const li = document.createElement('li'); li.textContent = e; errList.appendChild(li); });
-  errPanel.classList.toggle('visible', errors.length > 0);
+        const percentage = (parseFloat(obt) / parseFloat(max)) * 100;
+        
+        document.getElementById('percOut').innerText = `${percentage.toFixed(2)}%`;
+        document.getElementById('percResults').style.display = 'block';
+    }
 
-  // Dupes panel
-  const dupPanel = document.getElementById('sg-dupes-panel');
-  const dupList = document.getElementById('sg-dupes-list');
-  dupList.innerHTML = '';
-  dupes.forEach(d => { const li = document.createElement('li'); li.textContent = d; dupList.appendChild(li); });
-  dupPanel.classList.toggle('visible', dupes.length > 0);
+    // Tool 3 Logic
+    function calculateStandard() {
+        const obt = document.getElementById('singleObtained').value;
+        const max = document.getElementById('singleMax').value;
 
-  if (!valid.length) {
-    document.getElementById('sg-preview').style.display = 'none';
-    alert('No valid phone numbers found. Please check your input.');
-    return;
-  }
+        if (!max || max <= 0 || !obt) {
+            alert("Please enter valid marks.");
+            return;
+        }
 
-  const tabBase = document.getElementById('sg-tab').value.trim() || 'Ajisha - WhatsApp';
-  const TITLE = 'YOU TUBE DATA AJISHA';
-
-  const chunks = [];
-  for (let i = 0; i < numSheets; i++) {
-    const chunk = valid.slice(i * perSheet, (i + 1) * perSheet);
-    if (chunk.length) chunks.push(chunk);
-  }
-
-  const wb = XLSX.utils.book_new();
-  const sheetMeta = [];
-
-  chunks.forEach((chunk, idx) => {
-    const tabName = (chunks.length === 1 ? tabBase : `${tabBase} ${idx + 1}`).slice(0, 31);
-    XLSX.utils.book_append_sheet(wb, sgBuildSheet(chunk, TITLE), tabName);
-    sheetMeta.push({ name: tabName, count: chunk.length });
-  });
-
-  XLSX.writeFile(wb, `${tabBase.replace(/[^a-z0-9_\-]/gi, '_')}.xlsx`, { cellStyles: true });
-
-  document.getElementById('sg-sheet-cards').innerHTML = sheetMeta.map(s =>
-    `<div class="sg-sheet-card">📄 ${s.name} — <b>${s.count}</b> numbers</div>`
-  ).join('');
-
-  const show = chunks[0].slice(0, 8);
-  let html = `<tr class="r-title"><td colspan="5">${TITLE}</td></tr>`;
-  html += `<tr class="r-header"><th>SL</th><th>Phone</th><th>Course</th><th>DETAILS</th><th></th></tr>`;
-  show.forEach((ph, i) => {
-    html += `<tr class="r-sl"><td style="text-align:right;font-weight:bold">${i + 1}</td><td></td><td></td><td></td><td></td></tr>`;
-    html += `<tr><td></td><td>${ph}</td><td></td><td></td><td></td></tr>`;
-  });
-  document.getElementById('sg-preview-tbl').innerHTML = html;
-  document.getElementById('sg-preview').style.display = 'block';
-}
-
-function sgClear() {
-  document.getElementById('sg-input').value = '';
-  document.getElementById('sg-custom-n').value = '';
-  document.getElementById('sg-stats').style.display = 'none';
-  document.getElementById('sg-errors').classList.remove('visible');
-  document.getElementById('sg-dupes-panel').classList.remove('visible');
-  document.getElementById('sg-preview').style.display = 'none';
-  document.getElementById('sg-hint').innerHTML = '— paste numbers above to see the split';
-  document.querySelectorAll('.sg-chip').forEach(c => c.classList.remove('active'));
-  document.querySelector('.sg-chip[data-n="4"]').classList.add('active');
-  sgActiveSheets = 4;
-}
+        const standardScore = (parseFloat(obt) / parseFloat(max)) * 100;
+        
+        document.getElementById('stdOut').innerText = `${standardScore.toFixed(2)} / 100`;
+        document.getElementById('stdResults').style.display = 'block';
+    }
 </script>
+
 </body>
 </html>
